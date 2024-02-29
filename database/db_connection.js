@@ -14,11 +14,11 @@ const createConnectionPool = () => {
     waitForConnections: true,
     connectionLimit: process.env.DB_CONNECTION_TIMEOUT,
     queueLimit: 0,
-    // ssl: process.env.DB_SSL === 'true' ? {
-    //   ca: fs.readFileSync('path/to/ca-cert.pem'),
-    //   key: fs.readFileSync('path/to/client-key.pem'),
-    //   cert: fs.readFileSync('path/to/client-cert.pem'),
-    // } : undefined,
+    ssl: process.env.DB_SSL === 'true' ? {
+      ca: fs.readFileSync('path/to/ca-cert.pem'),
+      key: fs.readFileSync('path/to/client-key.pem'),
+      cert: fs.readFileSync('path/to/client-cert.pem'),
+    } : undefined,
   });
 };
 
