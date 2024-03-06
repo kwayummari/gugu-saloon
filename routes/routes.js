@@ -60,6 +60,6 @@ router.post('/tax', tax.getTax);
 router.post('/delete_product', deleteProducts.deleteProduct)
 router.post('/get_purchases', getPurchases.getPurchase)
 router.post('/getHairDresser', getAllHairDresser.getHairDressers);
-router.post('/register_hairdresser', validateRole, registerRole);
+router.post('/register_hairdresser', validateHairdresser, registerHairDresser);
 
 module.exports = router;
