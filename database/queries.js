@@ -61,6 +61,7 @@ WHERE user.role != 1 AND user.companyId = ?;
   get_branch: 'SELECT * FROM branch WHERE companyId = ? AND id = ?',
   get_inventory: 'SELECT * FROM inventory WHERE id = ?',
   getHairDresser: 'SELECT * FROM hairdresser WHERE companyId = ?',
+  check_hairdresser_existence: 'SELECT * FROM hairdresser WHERE name = ? AND companyId = ? LIMIT 1',
 };
 
 module.exports = queries;

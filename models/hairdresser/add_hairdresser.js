@@ -21,7 +21,7 @@ const registerHairDresser = async (req, res) => {
         const connectionPool = await connectionPoolWithRetry();
 
         connectionPool.query(
-            queries.check_role_existence,
+            queries.check_hairdresser_existence,
             [name, companyId],
             (error, result) => {
                 if (error) {
