@@ -2,8 +2,8 @@ const connectionPoolWithRetry = require('../../database/db_connection');
 const queries = require('../../database/queries');
 
 const getRolesById = async (req, res) => {
-  try {
-    const roleId = req.body.id;
+    try {
+        const roleId = req.body.id;
     const connectionPool = await connectionPoolWithRetry();
     connectionPool.query(queries.getRolesById, [roleId], async (error, rolesResults) => {
       if (error) {
@@ -37,5 +37,5 @@ const getRolesById = async (req, res) => {
 };
 
 module.exports = {
-  getRolesById,
+    getRolesById,
 };

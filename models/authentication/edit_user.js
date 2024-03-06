@@ -48,7 +48,7 @@ const editUser = async (req, res) => {
             }
         );
     } catch (err) {
-        console.error('Error creating user:', err);
+        console.error('Error editing user:', err);
         res.status(500).json({ message: 'Server Error' });
     }
 };

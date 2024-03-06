@@ -34,7 +34,7 @@ const registerUser = async (req, res) => {
       const firstError = errors.array()[0];
       return res.status(300).json({ message: firstError.msg });
     }
-    const { fullname, phone, email, branch, role, password } = req.body;
+    const { fullname, phone, email, branch, role, password, companyId, } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
     const connectionPool = await connectionPoolWithRetry();
 
@@ -50,7 +50,7 @@ const registerUser = async (req, res) => {
         }
         connectionPool.query(
           queries.register_user,
-          [fullname, phone, email, branch, role,  hashedPassword],
+          [fullname, phone, email, branch, role,  hashedPassword, companyId,],
           (error, result) => {
             if (error) {
               return res.status(500).json({ message: error.message });

@@ -17,12 +17,12 @@ const registerRole = async (req, res) => {
             const firstError = errors.array()[0];
             return res.status(300).json({ message: firstError.msg });
         }
-        const { name } = req.body;
+        const { name, companyId } = req.body;
         const connectionPool = await connectionPoolWithRetry();
 
         connectionPool.query(
             queries.check_role_existence,
-            [name],
+            [name, companyId],
             (error, result) => {
                 if (error) {
                     return res.status(500).json({ message: error.message });
@@ -32,7 +32,7 @@ const registerRole = async (req, res) => {
                 }
                 connectionPool.query(
                     queries.register_role,
-                    [name],
+                    [name, companyId],
                     (error, result) => {
                         if (error) {
                             return res.status(500).json({ message: error.message });

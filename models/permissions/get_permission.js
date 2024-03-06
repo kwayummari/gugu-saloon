@@ -15,14 +15,10 @@ const getPermissions = async (req, res) => {
       if (results.length === 0) {
         return res.status(400).json({ message: 'Permissions not found' });
       }
-
-      // Array to hold all permissions with submenus
       const permissionsWithSubmenus = [];
 
       for (const permission of results) {
-        // Fetch submenu for each menuId
         const submenu = await fetchSubmenu(connectionPool, permission.menuId);
-        // Add submenu to the permission object
         permission.submenu = submenu;
         permissionsWithSubmenus.push(permission);
       }
@@ -35,7 +31,6 @@ const getPermissions = async (req, res) => {
   }
 };
 
-// Function to fetch submenu for a given menuId
 const fetchSubmenu = (connectionPool, menuId) => {
   return new Promise((resolve, reject) => {
     connectionPool.query(queries.getSubmenu, [menuId], (error, results) => {
