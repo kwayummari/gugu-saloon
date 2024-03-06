@@ -29,6 +29,7 @@ const tax = require('../models/tax/get_tax');
 const deleteProducts = require('../models/inventory/delete_product');
 const getPurchases = require('../models/purchase/get_purchase');
 const getAllHairDresser = require('../models/hairdresser/get_hairdresser')
+const { validateHairdresser, registerHairDresser } = require('../models/hairdresser/add_hairdresser');
 
 router.post('/login',validateLogin, loginUser);
 router.post('/register_user',validateUser, registerUser);
@@ -59,5 +60,6 @@ router.post('/tax', tax.getTax);
 router.post('/delete_product', deleteProducts.deleteProduct)
 router.post('/get_purchases', getPurchases.getPurchase)
 router.post('/getHairDresser', getAllHairDresser.getHairDressers);
+router.post('/register_hairdresser', validateRole, registerRole);
 
 module.exports = router;
