@@ -5,7 +5,7 @@ const getRoles = async (req, res) => {
   try {
     const connectionPool = await connectionPoolWithRetry();
 
-    connectionPool.query(queries.getRoles, async (error, rolesResults) => {
+    connectionPool.query(queries.getHairDresser, async (error, rolesResults) => {
       if (error) {
         console.error('Error fetching roles:', error);
         return res.status(500).json({ message: 'Internal Server Error' });

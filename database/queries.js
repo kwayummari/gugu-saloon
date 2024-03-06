@@ -60,6 +60,7 @@ WHERE user.role != 1 AND user.companyId = ?;
   get_order: 'SELECT * FROM purchase WHERE companyId = ? AND supplierId = ? AND status = ?',
   get_branch: 'SELECT * FROM branch WHERE companyId = ? AND id = ?',
   get_inventory: 'SELECT * FROM inventory WHERE id = ?',
+  getHairDresser: 'SELECT * FROM roles WHERE companyId = ?',
 };
 
 module.exports = queries;
