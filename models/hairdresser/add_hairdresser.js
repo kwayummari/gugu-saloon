@@ -31,7 +31,7 @@ const registerHairDresser = async (req, res) => {
                     return res.status(400).json({ message: 'Hair dresser already exists' });
                 }
                 connectionPool.query(
-                    queries.register_role,
+                    queries.register_hairdresser,
                     [name, companyId],
                     (error, result) => {
                         if (error) {
