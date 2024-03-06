@@ -4,7 +4,7 @@ const queries = require('../../database/queries');
 const getHairDressers = async (req, res) => {
   try {
     const connectionPool = await connectionPoolWithRetry();
-    const companyId = req.body.companyId;
+    const companyId = '1';
     console.log(companyId)
     connectionPool.query(queries.getHairDresser, [companyId], async (error, hairDresserResults) => {
       if (error) {

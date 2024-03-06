@@ -58,6 +58,6 @@ router.post('/products', getProduct.getProducts);
 router.post('/tax', tax.getTax);
 router.post('/delete_product', deleteProducts.deleteProduct)
 router.post('/get_purchases', getPurchases.getPurchase)
-router.get('/getHairDresser', getAllHairDresser.getHairDressers);
+router.post('/getHairDresser', getAllHairDresser.getHairDressers);
 
 module.exports = router;
