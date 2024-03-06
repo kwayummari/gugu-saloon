@@ -28,7 +28,7 @@ const registerHairDresser = async (req, res) => {
                     return res.status(500).json({ message: error.message });
                 }
                 if (result.length > 0) {
-                    return res.status(400).json({ message: 'Role already exists' });
+                    return res.status(400).json({ message: 'Hair dresser already exists' });
                 }
                 connectionPool.query(
                     queries.register_role,
@@ -37,30 +37,7 @@ const registerHairDresser = async (req, res) => {
                         if (error) {
                             return res.status(500).json({ message: error.message });
                         }
-                        const roleId = result.insertId;
-
-                        const permission = [
-                            { name: 'User Management', menuId: '1' },
-                            { name: 'Sales Management', menuId: '2' },
-                            { name: 'Purchase Order Management', menuId: '3' },
-                            { name: 'Stock Management', menuId: '4' },
-                            { name: 'Supplier Management', menuId: '5' },
-                            { name: 'Financial Management', menuId: '6' },
-                            { name: 'Report Management', menuId: '7' },
-                        ];
-                        permission.forEach(({ name, menuId }) => {
-                            connectionPool.query(
-                                queries.register_permission,
-                                [name, roleId, menuId],
-                                (error, result) => {
-                                    if (error) {
-                                        return console.error('Error registering permission:', error);
-                                    }
-                                }
-                            );
-                        });
-
-                        return res.status(200).json({ message: 'Role created successfully', roleId });
+                        return res.status(200).json({ message: 'Hair dresser created successfully', result });
                     }
                 );
             }
