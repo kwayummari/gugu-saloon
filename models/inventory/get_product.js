@@ -16,12 +16,17 @@ const getProducts = async (req, res) => {
       }
       const productWithBranch = await Promise.all(productResults.map(async product => {
         return new Promise((resolve, reject) => {
-          connectionPool.query(queries.getBranchById, [product.branchId], (error, productResults) => {
+          connectionPool.query(queries.getBranchById, [product.branchId], (error, branchResults) => {
             if (error) {
-              console.error('Error fetching products:', error);
+              console.error('Error fetching branch:', error);
               reject(error);
             } else {
-              product.branchId = productResults;
+              const branch = branchResults[0];
+              if (branch) {
+                product.branch = `${branch.name}`;
+              } else {
+                product.branch = "Branch not found";
+              }
               resolve(product);
             }
           });
