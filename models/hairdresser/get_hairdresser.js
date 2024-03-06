@@ -7,30 +7,15 @@ const getHairDressers = async (req, res) => {
 
     connectionPool.query(queries.getHairDresser, async (error, rolesResults) => {
       if (error) {
-        console.error('Error fetching roles:', error);
+        console.error('Error fetching hair dresser:', error);
         return res.status(500).json({ message: 'Internal Server Error' });
       }
 
       if (rolesResults.length === 0) {
-        return res.status(404).json({ message: 'No roles found' });
+        return res.status(404).json({ message: 'No hair dresser found' });
       }
 
-      // Fetch permissions for each role
-      const rolesWithPermissions = await Promise.all(rolesResults.map(async role => {
-        return new Promise((resolve, reject) => {
-          connectionPool.query(queries.getPermissions, [role.id], (error, permissionsResults) => {
-            if (error) {
-              console.error('Error fetching permissions:', error);
-              reject(error);
-            } else {
-              role.permissions = permissionsResults;
-              resolve(role);
-            }
-          });
-        });
-      }));
-
-      res.status(200).json({ message: 'Hair fetched successfully', roles: rolesWithPermissions });
+      res.status(200).json({ message: 'Hair fetched successfully', roles: rolesResults });
     });
   } catch (err) {
     console.error('Error initializing connection:', err);
