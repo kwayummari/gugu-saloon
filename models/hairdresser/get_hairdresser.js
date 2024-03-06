@@ -1,7 +1,7 @@
 const connectionPoolWithRetry = require('../../database/db_connection');
 const queries = require('../../database/queries');
 
-const getRoles = async (req, res) => {
+const getHairDressers = async (req, res) => {
   try {
     const connectionPool = await connectionPoolWithRetry();
 
@@ -30,7 +30,7 @@ const getRoles = async (req, res) => {
         });
       }));
 
-      res.status(200).json({ message: 'Roles fetched successfully', roles: rolesWithPermissions });
+      res.status(200).json({ message: 'Hair fetched successfully', roles: rolesWithPermissions });
     });
   } catch (err) {
     console.error('Error initializing connection:', err);
@@ -39,5 +39,5 @@ const getRoles = async (req, res) => {
 };
 
 module.exports = {
-  getRoles,
+  getHairDressers,
 };
