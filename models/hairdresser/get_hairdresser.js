@@ -4,8 +4,9 @@ const queries = require('../../database/queries');
 const getHairDressers = async (req, res) => {
   try {
     const connectionPool = await connectionPoolWithRetry();
-
-    connectionPool.query(queries.getHairDresser, async (error, hairDresserResults) => {
+    const companyId = req.body.companyId;
+    console.log(companyId)
+    connectionPool.query(queries.getHairDresser, [companyId], async (error, hairDresserResults) => {
       if (error) {
         console.error('Error fetching hair dresser:', error);
         return res.status(500).json({ message: 'Internal Server Error' });
