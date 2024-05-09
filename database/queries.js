@@ -6,7 +6,7 @@ const queries = {
   INNER JOIN roles ON user.role = roles.id
   WHERE user.role != 1;
 `,
-getAllUsersByCompany: `
+  getAllUsersByCompany: `
 SELECT user.*, branch.name AS branch_name, roles.name AS role_name
 FROM user
 INNER JOIN branch ON user.branch = branch.id
@@ -63,6 +63,21 @@ WHERE user.role != 1 AND user.companyId = ?;
   getHairDresser: 'SELECT * FROM hairdresser WHERE companyId = ?',
   check_hairdresser_existence: 'SELECT * FROM hairdresser WHERE name = ? AND companyId = ? LIMIT 1',
   register_hairdresser: 'INSERT INTO hairdresser (name, companyId) VALUES (?, ?)',
+  check_hairStyle_existence: 'SELECT * FROM hairStyle WHERE name = ? AND companyId = ? LIMIT 1',
+  register_hairStyle: 'INSERT INTO hairStyle (name, amount, companyId) VALUES (?, ?, ?)',
+  check_hairStyle_existence_byId: 'SELECT * FROM hairDressing WHERE misukoId = ? LIMIT 1',
+  deleteMsuko: 'DELETE FROM hairStyle WHERE id = ?',
+  checkForHairStyle: 'SELECT * FROM hairStyle WHERE name = ? AND id = ? LIMIT 1',
+  edit_Hairstyle: `UPDATE hairStyle SET name = ?, amount = ? WHERE id = ?`,
+  getHairStyles: 'SELECT * FROM hairStyle WHERE companyId = ?',
+  getHairstyleById: 'SELECT * FROM hairStyle WHERE id = ?',
+  check_for_hairdresser: 'SELECT * FROM hairDressing WHERE hairStyleId = ? AND hairdresserId = ?  LIMIT 1',
+  register_hairdressing: 'INSERT INTO hairDressing (hairStyleId, hairdresserId) VALUES (?, ?)',
+  get_hairdressing: `SELECT hairDressing.*, hairDresser.name AS hairDresserName
+  FROM hairDressing
+  JOIN hairDresser ON hairDressing.hairDresserId = hairDresser.id
+  WHERE hairDressing.hairStyleId = ?;
+  `,
 };
 
 module.exports = queries;

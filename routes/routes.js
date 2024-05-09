@@ -30,6 +30,13 @@ const deleteProducts = require('../models/inventory/delete_product');
 const getPurchases = require('../models/purchase/get_purchase');
 const getAllHairDresser = require('../models/hairdresser/get_hairdresser')
 const { validateHairdresser, registerHairDresser } = require('../models/hairdresser/add_hairdresser');
+const { validateHairStyle, registerHairStyle } = require('../models/misuko/add_misuko');
+const getAllHairStyle = require('../models/misuko/get_misuko_by_id');
+const getAllHairStyles = require('../models/misuko/get_all_misuko');
+const deleteHairStyles = require('../models/misuko/delete_misuko');
+const { validateEditMsuko, editMsuko } = require('../models/misuko/edit_msuko');
+const { validateHairdressers, postHairDresser } = require('../models/hairdresser/post_hairdresser');
+const getHairDressings = require('../models/hairdresser/get_hairdressing')
 
 router.post('/login',validateLogin, loginUser);
 router.post('/register_user',validateUser, registerUser);
@@ -61,5 +68,12 @@ router.post('/delete_product', deleteProducts.deleteProduct)
 router.post('/get_purchases', getPurchases.getPurchase)
 router.post('/getHairDresser', getAllHairDresser.getHairDressers);
 router.post('/register_hairdresser', validateHairdresser, registerHairDresser);
+router.post('/register_hairStyle', validateHairStyle, registerHairStyle);
+router.post('/getHairStyle', getAllHairStyle.getMisukoById);
+router.post('/getAllHairStyle', getAllHairStyles.getMisuko);
+router.post('/deleteHairStyle', deleteHairStyles.deleteMisuko);
+router.post('/edit_hairStyle', validateEditMsuko, editMsuko);
+router.post('/post_hairDresser', validateHairdressers, postHairDresser);
+router.post('/getHairDressing', getHairDressings.getHairDressing);
 
 module.exports = router;
