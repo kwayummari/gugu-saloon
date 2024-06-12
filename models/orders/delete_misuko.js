@@ -1,28 +1,28 @@
 const connectionPoolWithRetry = require('../../database/db_connection');
 const queries = require('../../database/queries');
 
-const deleteProduct = async (req, res) => {
+const deleteMisuko = async (req, res) => {
     try {
         const connectionPool = await connectionPoolWithRetry();
 
         const id = req.body.id;
         connectionPool.query(
-            queries.check_inventory_existence,
+            queries.check_hairStyle_existence_byId,
             [id],
             (error, result) => {
                 if (error) {
                     return res.status(500).json({ message: error.message });
                 }
                 if (result.length > 0) {
-                    return res.status(400).json({ message: "Product can't be deleted right now" });
+                    return res.status(400).json({ message: "Hair style can't be deleted some users are registered with it" });
                 }
-                connectionPool.query(queries.deleteProduct, [id], (error, results) => {
+                connectionPool.query(queries.deleteMsuko, [id], (error, results) => {
                     if (error) {
-                        console.error('Error deleting product:', error);
+                        console.error('Error deleting role:', error);
                         return res.status(500).json({ message: 'Internal Server Error' });
                     }
         
-                    res.status(200).json({ message: 'Product deleted successfully', user: results[0] });
+                    res.status(200).json({ message: 'Hair style deleted successfully', user: results[0] });
                 });
             }
         );
@@ -33,5 +33,5 @@ const deleteProduct = async (req, res) => {
 };
 
 module.exports = {
-    deleteProduct,
+    deleteMisuko,
 };

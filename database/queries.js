@@ -15,6 +15,7 @@ WHERE user.role != 1 AND user.companyId = ?;
 `,
   getUserById: 'SELECT * FROM user WHERE id = ?',
   login: 'SELECT * FROM user WHERE email = ?',
+  loginHairDresser: 'SELECT * FROM hairdresser WHERE name = ?',
   register_user: 'INSERT INTO user (fullname, phone, email, branch, role, password, companyId) VALUES (?, ?, ?, ?, ?, ?, ?)',
   check_user_existence: 'SELECT * FROM user WHERE fullname = ? OR phone = ? OR email = ? LIMIT 1',
   check_user_existence_by_id: 'SELECT * FROM user WHERE id = ? LIMIT 1',
@@ -32,6 +33,7 @@ WHERE user.role != 1 AND user.companyId = ?;
   getBranch: 'SELECT * FROM branch WHERE companyId = ?',
   check_role_existence: 'SELECT * FROM roles WHERE name = ? AND companyId = ? LIMIT 1',
   edit_role: 'UPDATE roles SET name = ? WHERE id = ?',
+  edit_product: 'UPDATE inventory SET name = ?, description = ?, quantity = ?, buyingPrice = ?, sellingPrice = ?, branchId = ?, companyId = ?, userId = ? WHERE id = ?',
   deleteUser: 'DELETE FROM user WHERE id = ?',
   check_branch_existence: 'SELECT * FROM branch WHERE name = ? AND companyId = ? LIMIT 1',
   check_branch_user_existence: 'SELECT * FROM user WHERE branch = ? LIMIT 1',
@@ -50,8 +52,8 @@ WHERE user.role != 1 AND user.companyId = ?;
   check_supplier_user_existence: 'SELECT * FROM inventory WHERE supplierId = ? LIMIT 1',
   deleteSupplier: 'DELETE FROM supplier WHERE id = ?',
   edit_supplier: 'UPDATE supplier SET name = ?, phone = ?, tin = ?, location = ?, branch = ?, companyId = ?  WHERE id = ?',
-  check_product_existence: 'SELECT * FROM inventory WHERE name = ? AND branchId = ? AND companyId = ? LIMIT 1',
-  register_product: 'INSERT INTO inventory (name, description, quantity, buyingPrice, sellingPrice, productNumber, taxType, branchId, companyId, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+  check_inventory_existence: 'SELECT * FROM inventory WHERE name = ? AND branchId = ? AND companyId = ? LIMIT 1',
+  register_product: 'INSERT INTO inventory (name, description, quantity, buyingPrice, sellingPrice, branchId, companyId, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
   get_products: 'SELECT * FROM inventory WHERE companyId = ?',
   getBranchById: 'SELECT * FROM branch WHERE id = ?',
   getTax: 'SELECT * FROM tax',
@@ -61,6 +63,11 @@ WHERE user.role != 1 AND user.companyId = ?;
   get_branch: 'SELECT * FROM branch WHERE companyId = ? AND id = ?',
   get_inventory: 'SELECT * FROM inventory WHERE id = ?',
   getHairDresser: 'SELECT * FROM hairdresser WHERE companyId = ?',
+  getHairDresserById: `SELECT hairDressing.*, hairDresser.name AS hairDresserName
+  FROM hairDressing
+  INNER JOIN hairDresser ON hairDressing.hairDresserId = hairDresser.id
+  WHERE hairDressing.hairStyleId = ?
+  `,
   check_hairdresser_existence: 'SELECT * FROM hairdresser WHERE name = ? AND companyId = ? LIMIT 1',
   register_hairdresser: 'INSERT INTO hairdresser (name, companyId) VALUES (?, ?)',
   check_hairStyle_existence: 'SELECT * FROM hairStyle WHERE name = ? AND companyId = ? LIMIT 1',
@@ -78,6 +85,7 @@ WHERE user.role != 1 AND user.companyId = ?;
   JOIN hairDresser ON hairDressing.hairDresserId = hairDresser.id
   WHERE hairDressing.hairStyleId = ?;
   `,
+  add_order: 'INSERT INTO orders (name, phone, hairStyleId, inventoryId, number, hairDresserId) VALUES (?, ?, ?, ?, ?, ?)',
 };
 
 module.exports = queries;

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const {validateLogin,loginUser} = require('../models/authentication/login');
+const { validateLogin, loginUser } = require('../models/authentication/login');
+const {validateLoginHairDresser,loginHairDresser} = require('../models/authentication/loginHairDresser');
 const {validateUser,registerUser} = require('../models/authentication/register_user');
 const getUsers = require('../models/authentication/get_users');
 const getPermissions = require('../models/permissions/get_permission')
@@ -24,11 +25,13 @@ const { validateSupplier, registerSupplier } = require('../models/supplier/add_s
 const deleteSuppliers = require('../models/supplier/delete_supplier');
 const { validateEditingSupplier, editSupplier } = require('../models/supplier/edit_supplier');
 const { validateProduct, registerProduct } = require('../models/inventory/add_product');
+const {validateEditProduct,edit_product} = require('../models/inventory/edit_product');
 const getProduct = require('../models/inventory/get_product');
 const tax = require('../models/tax/get_tax');
 const deleteProducts = require('../models/inventory/delete_product');
 const getPurchases = require('../models/purchase/get_purchase');
 const getAllHairDresser = require('../models/hairdresser/get_hairdresser')
+const getAllHairDresserByIds = require('../models/hairdresser/get_hairdresser_by_id')
 const { validateHairdresser, registerHairDresser } = require('../models/hairdresser/add_hairdresser');
 const { validateHairStyle, registerHairStyle } = require('../models/misuko/add_misuko');
 const getAllHairStyle = require('../models/misuko/get_misuko_by_id');
@@ -36,9 +39,11 @@ const getAllHairStyles = require('../models/misuko/get_all_misuko');
 const deleteHairStyles = require('../models/misuko/delete_misuko');
 const { validateEditMsuko, editMsuko } = require('../models/misuko/edit_msuko');
 const { validateHairdressers, postHairDresser } = require('../models/hairdresser/post_hairdresser');
-const getHairDressings = require('../models/hairdresser/get_hairdressing')
+const getHairDressings = require('../models/hairdresser/get_hairdressing');
+const { validateOrder, registerOrder } = require('../models/orders/add_order');
 
-router.post('/login',validateLogin, loginUser);
+router.post('/login', validateLogin, loginUser);
+router.post('/loginHairDresser',validateLoginHairDresser,loginHairDresser);
 router.post('/register_user',validateUser, registerUser);
 router.get('/users', getUsers.getAllUsers);
 router.post('/getUserByCompanyId', getUserByCompanyId.getUserByCompanyId);
@@ -62,11 +67,13 @@ router.post('/register_supplier', validateSupplier, registerSupplier);
 router.post('/deleteSupplier', deleteSuppliers.deleteSupplier)
 router.post('/edit_supplier', validateEditingSupplier, editSupplier);
 router.post('/register_product', validateProduct, registerProduct);
+router.post('/edit_product', validateEditProduct,edit_product);
 router.post('/products', getProduct.getProducts);
 router.post('/tax', tax.getTax);
 router.post('/delete_product', deleteProducts.deleteProduct)
 router.post('/get_purchases', getPurchases.getPurchase)
 router.post('/getHairDresser', getAllHairDresser.getHairDressers);
+router.post('/getHairDresserById', getAllHairDresserByIds.getHairDressersById);
 router.post('/register_hairdresser', validateHairdresser, registerHairDresser);
 router.post('/register_hairStyle', validateHairStyle, registerHairStyle);
 router.post('/getHairStyle', getAllHairStyle.getMisukoById);
@@ -75,5 +82,6 @@ router.post('/deleteHairStyle', deleteHairStyles.deleteMisuko);
 router.post('/edit_hairStyle', validateEditMsuko, editMsuko);
 router.post('/post_hairDresser', validateHairdressers, postHairDresser);
 router.post('/getHairDressing', getHairDressings.getHairDressing);
+router.post('/addOrder', validateOrder, registerOrder);
 
 module.exports = router;
