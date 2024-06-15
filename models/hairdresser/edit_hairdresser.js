@@ -2,13 +2,13 @@ const connectionPoolWithRetry = require('../../database/db_connection');
 const { body, validationResult } = require('express-validator');
 const queries = require('../../database/queries');
 
-const validateEditRole = [
+const validateEditHairDresser = [
     body('name').trim().notEmpty().withMessage('Name is required').isLength({ max: 50 })
         .withMessage('Name must be at most 50 characters').isLength({ min: 3 })
         .withMessage('Name must be at least 4 characters'),
 ];
 
-const editRole = async (req, res) => {
+const editHairDresser = async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -19,23 +19,23 @@ const editRole = async (req, res) => {
         const connectionPool = await connectionPoolWithRetry();
 
         connectionPool.query(
-            queries.check_role_existence,
+            queries.check_edit_hairdresser_existence,
             [name, id],
             (error, result) => {
                 if (error) {
                     return res.status(500).json({ message: error.message });
                 }
                 if (result.length = 0) {
-                    return res.status(400).json({ message: "Role doesn't exists" });
+                    return res.status(400).json({ message: "Hair dresser doesn't exists" });
                 }
                 connectionPool.query(
-                    queries.edit_role,
+                    queries.edit_hairdresser,
                     [name, id],
                     (error, result) => {
                         if (error) {
                             return res.status(500).json({ message: error.message });
                         }
-                        return res.status(200).json({ message: 'Role edited successfully'});
+                        return res.status(200).json({ message: 'Hair dresser edited successfully'});
                     }
                 );
             }
@@ -47,6 +47,6 @@ const editRole = async (req, res) => {
 };
 
 module.exports = {
-    validateEditRole,
-    editRole,
+    validateEditHairDresser,
+    editHairDresser,
 };

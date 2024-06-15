@@ -12,6 +12,9 @@ const updatePermissions = require('../models/permissions/update_permissions')
 const getBranches = require('../models/branch/get_branch')
 const getRoles = require('../models/roles/get_all_roles')
 const deleteUserById = require('../models/authentication/delete_user')
+const deleteHairDresser = require('../models/hairdresser/delete_hairdresser')
+const delete_hairdresser_hairstyling = require('../models/hairdresser/delete_hairdresser-hairstyling')
+const disableHairDressing = require('../models/hairdresser/disable_hairdresser')
 const { validateRole, registerRole } = require('../models/roles/add_roles');
 const { validateEditRole, editRole } = require('../models/roles/edit_role');
 const { validateEditingUser, editUser } = require('../models/authentication/edit_user');
@@ -38,6 +41,7 @@ const getAllHairStyle = require('../models/misuko/get_misuko_by_id');
 const getAllHairStyles = require('../models/misuko/get_all_misuko');
 const deleteHairStyles = require('../models/misuko/delete_misuko');
 const { validateEditMsuko, editMsuko } = require('../models/misuko/edit_msuko');
+const { validateEditHairDresser, editHairDresser } = require('../models/hairdresser/edit_hairdresser');
 const { validateHairdressers, postHairDresser } = require('../models/hairdresser/post_hairdresser');
 const getHairDressings = require('../models/hairdresser/get_hairdressing');
 const { validateOrder, registerOrder } = require('../models/orders/add_order');
@@ -55,6 +59,9 @@ router.post('/edit_role', validateEditRole, editRole);
 router.post('/getBranch', getBranches.getBranch);
 router.post('/getAllRoles', getRoles.getRoles);
 router.post('/deleteUserById', deleteUserById.deleteUsersById)
+router.post('/deleteHairDresser', deleteHairDresser.deleteHairDresser)
+router.post('/delete_hairdresser_hairstyling', delete_hairdresser_hairstyling.delete_hairdresser_hairstyling)
+router.post('/disable_hairdressing', disableHairDressing.disableHairdressing)
 router.post('/register_role', validateRole, registerRole);
 router.post('/edit_user', validateEditingUser, editUser);
 router.post('/deleteRole', deleteRoles.deleteRole)
@@ -80,6 +87,7 @@ router.post('/getHairStyle', getAllHairStyle.getMisukoById);
 router.post('/getAllHairStyle', getAllHairStyles.getMisuko);
 router.post('/deleteHairStyle', deleteHairStyles.deleteMisuko);
 router.post('/edit_hairStyle', validateEditMsuko, editMsuko);
+router.post('/edit_hairDresser', validateEditHairDresser, editHairDresser);
 router.post('/post_hairDresser', validateHairdressers, postHairDresser);
 router.post('/getHairDressing', getHairDressings.getHairDressing);
 router.post('/addOrder', validateOrder, registerOrder);
