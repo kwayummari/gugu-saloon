@@ -78,11 +78,11 @@ WHERE user.role != 1 AND user.companyId = ?;
   edit_hairdresser: 'UPDATE hairdresser SET name = ? WHERE id = ?',
   register_hairdresser: 'INSERT INTO hairdresser (name, companyId) VALUES (?, ?)',
   check_hairStyle_existence: 'SELECT * FROM hairStyle WHERE name = ? AND companyId = ? LIMIT 1',
-  register_hairStyle: 'INSERT INTO hairStyle (name, amount, companyId) VALUES (?, ?, ?)',
+  register_hairStyle: 'INSERT INTO hairStyle (name, amount, description, officeAmount, hairDresserAmount, costOfHair, vishanga, remainderAmount, companyId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
   check_hairStyle_existence_byId: 'SELECT * FROM hairDressing WHERE hairStyleId = ? LIMIT 1',
   deleteMsuko: 'DELETE FROM hairStyle WHERE id = ?',
   checkForHairStyle: 'SELECT * FROM hairStyle WHERE name = ? AND id = ? LIMIT 1',
-  edit_Hairstyle: `UPDATE hairStyle SET name = ?, amount = ? WHERE id = ?`,
+  edit_Hairstyle: `UPDATE hairStyle SET name = ?, amount = ?, description = ?, officeAmount = ?, hairDresserAmount = ?, costOfHair = ?, vishanga = ?, remainderAmount = ? WHERE id = ?`,
   getHairStyles: 'SELECT * FROM hairStyle WHERE companyId = ?',
   getHairstyleById: 'SELECT * FROM hairStyle WHERE id = ?',
   check_for_hairdresser: 'SELECT * FROM hairDressing WHERE hairStyleId = ? AND hairdresserId = ?  LIMIT 1',
@@ -92,7 +92,7 @@ WHERE user.role != 1 AND user.companyId = ?;
   JOIN hairDresser ON hairDressing.hairDresserId = hairDresser.id
   WHERE hairDressing.hairStyleId = ?;
   `,
-  add_order: 'INSERT INTO orders (name, phone, hairStyleId, inventoryId, number, hairDresserId) VALUES (?, ?, ?, ?, ?, ?)',
+  add_order: 'INSERT INTO orders (name, phone, hairStyleId, hairDresserId) VALUES (?, ?, ?, ?)',
 };
 
 module.exports = queries;

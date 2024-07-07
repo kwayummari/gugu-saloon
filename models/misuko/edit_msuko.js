@@ -7,6 +7,12 @@ const validateEditMsuko = [
         .withMessage('Name must be at most 50 characters').isLength({ min: 3 })
         .withMessage('Name must be at least 4 characters'),
     body('amount').trim().notEmpty().withMessage('Amount is required'),
+    body('description').trim().notEmpty().withMessage('Description is required'),
+    body('officeAmount').trim().notEmpty().withMessage('Office Amount is required'),
+    body('hairDresserAmount').trim().notEmpty().withMessage('Hair Dresser Amount is required'),
+    body('costOfHair').trim().notEmpty().withMessage('Cost Of Hair is required'),
+    body('vishanga').trim().notEmpty().withMessage('Vishanga is required'),
+    body('remainderAmount').trim().notEmpty().withMessage('Remainder Amount is required'),
 ];
 
 const editMsuko = async (req, res) => {
@@ -16,7 +22,7 @@ const editMsuko = async (req, res) => {
             const firstError = errors.array()[0];
             return res.status(300).json({ message: firstError.msg });
         }
-        const { name, amount, id } = req.body;
+        const { name, amount, description, officeAmount, hairDresserAmount, costOfHair, vishanga, remainderAmount, id } = req.body;
         const connectionPool = await connectionPoolWithRetry();
 
         connectionPool.query(
@@ -31,7 +37,7 @@ const editMsuko = async (req, res) => {
                 }
                 connectionPool.query(
                     queries.edit_Hairstyle,
-                    [name, amount, id],
+                    [name, amount, description, officeAmount, hairDresserAmount, costOfHair, vishanga, remainderAmount, id],
                     (error, result) => {
                         if (error) {
                             return res.status(500).json({ message: error.message });
