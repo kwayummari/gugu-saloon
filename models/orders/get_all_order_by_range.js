@@ -3,8 +3,7 @@ const queries = require('../../database/queries');
 
 const getOrdersByRange = async (req, res) => {
   try {
-    const startDate = '2024-07-09';
-    const endDate = '2024-07-11';
+    const {startDate, endDate} = req.body;
     const connectionPool = await connectionPoolWithRetry();
     
     connectionPool.query(queries.getOrdersByRange, [startDate, endDate, startDate, endDate, startDate, endDate], (error, results) => {
@@ -16,8 +15,6 @@ const getOrdersByRange = async (req, res) => {
       if (results.length === 0) {
         return res.status(404).json({ message: 'No orders found' });
       }
-
-      // Transform the results into the desired JSON structure
       let overallTotalOfficeAmount = 0;
       const hairDresserDict = {};
 
