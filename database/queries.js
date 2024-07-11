@@ -84,13 +84,23 @@ WHERE user.role != 1 AND user.companyId = ?;
   checkForHairStyle: 'SELECT * FROM hairStyle WHERE name = ? AND id = ? LIMIT 1',
   edit_Hairstyle: `UPDATE hairStyle SET name = ?, amount = ?, description = ?, officeAmount = ?, hairDresserAmount = ?, costOfHair = ?, vishanga = ?, remainderAmount = ? WHERE id = ?`,
   getHairStyles: 'SELECT * FROM hairStyle WHERE companyId = ?',
-  getOrders: `SELECT 
-    results.hairDresserName,
-    results.totalHairDresserAmount,
-    results.totalOfficeAmount,
-    totals.totalOfficeAmount AS overallTotalOfficeAmount
-FROM 
-    (SELECT 
+  getOrders: `WITH OrderDetails AS (
+    SELECT 
+        o.hairDresserId,
+        o.name AS orderName,
+        o.date AS orderDate,
+        hs.HairDresserAmount,
+        hs.officeAmount
+    FROM 
+        orders o
+    JOIN 
+        hairStyle hs ON o.hairstyleId = hs.id
+    WHERE 
+        DATE(o.date) = CURRENT_DATE
+),
+HairDresserAggregates AS (
+    SELECT 
+        hd.id AS hairDresserId,
         hd.name AS hairDresserName,
         SUM(hs.HairDresserAmount) AS totalHairDresserAmount,
         SUM(hs.officeAmount) AS totalOfficeAmount
@@ -103,23 +113,51 @@ FROM
     WHERE 
         DATE(o.date) = CURRENT_DATE
     GROUP BY 
-        hd.name) AS results,
-    (SELECT 
-        SUM(hs.officeAmount) AS totalOfficeAmount
+        hd.id, hd.name
+),
+TotalOfficeAmount AS (
+    SELECT 
+        SUM(hs.officeAmount) AS overallTotalOfficeAmount
     FROM 
         orders o
     JOIN 
         hairStyle hs ON o.hairstyleId = hs.id
     WHERE 
-        DATE(o.date) = CURRENT_DATE) AS totals
-`,
-getOrdersByRange: `SELECT 
-    results.hairDresserName,
-    results.totalHairDresserAmount,
-    results.totalOfficeAmount,
-    totals.totalOfficeAmount AS overallTotalOfficeAmount
+        DATE(o.date) = CURRENT_DATE
+)
+SELECT 
+    ha.hairDresserName,
+    ha.totalHairDresserAmount,
+    ha.totalOfficeAmount,
+    toa.overallTotalOfficeAmount,
+    od.orderName,
+    od.orderDate
 FROM 
-    (SELECT 
+    HairDresserAggregates ha
+JOIN 
+    OrderDetails od ON ha.hairDresserId = od.hairDresserId
+JOIN 
+    TotalOfficeAmount toa
+ORDER BY 
+    ha.hairDresserName, od.orderDate;
+`,
+getOrdersByRange: `WITH OrderDetails AS (
+    SELECT 
+        o.hairDresserId,
+        o.name AS orderName,
+        o.date AS orderDate,
+        hs.HairDresserAmount,
+        hs.officeAmount
+    FROM 
+        orders o
+    JOIN 
+        hairStyle hs ON o.hairstyleId = hs.id
+    WHERE 
+        o.date BETWEEN ? AND ?
+),
+HairDresserAggregates AS (
+    SELECT 
+        hd.id AS hairDresserId,
         hd.name AS hairDresserName,
         SUM(hs.HairDresserAmount) AS totalHairDresserAmount,
         SUM(hs.officeAmount) AS totalOfficeAmount
@@ -132,15 +170,33 @@ FROM
     WHERE 
         o.date BETWEEN ? AND ?
     GROUP BY 
-        hd.name) AS results,
-    (SELECT 
-        SUM(hs.officeAmount) AS totalOfficeAmount
+        hd.id, hd.name
+),
+TotalOfficeAmount AS (
+    SELECT 
+        SUM(hs.officeAmount) AS overallTotalOfficeAmount
     FROM 
         orders o
     JOIN 
         hairStyle hs ON o.hairstyleId = hs.id
     WHERE 
-        o.date BETWEEN ? AND ?) AS totals
+        o.date BETWEEN ? AND ?
+)
+SELECT 
+    ha.hairDresserName,
+    ha.totalHairDresserAmount,
+    ha.totalOfficeAmount,
+    toa.overallTotalOfficeAmount,
+    od.orderName,
+    od.orderDate
+FROM 
+    HairDresserAggregates ha
+JOIN 
+    OrderDetails od ON ha.hairDresserId = od.hairDresserId
+JOIN 
+    TotalOfficeAmount toa
+ORDER BY 
+    ha.hairDresserName, od.orderDate;
 `,
   getHairstyleById: 'SELECT * FROM hairStyle WHERE id = ?',
   check_for_hairdresser: 'SELECT * FROM hairDressing WHERE hairStyleId = ? AND hairdresserId = ?  LIMIT 1',

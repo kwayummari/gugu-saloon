@@ -87,7 +87,7 @@ router.post('/register_hairStyle', validateHairStyle, registerHairStyle);
 router.post('/getHairStyle', getAllHairStyle.getMisukoById);
 router.post('/getAllHairStyle', getAllHairStyles.getMisuko);
 router.post('/getOrders', getAllOrders.getOrders);
-router.post('/getOrdersByRange', getAllOrdersByRange.getOrdersByRange);
+router.get('/getOrdersByRange', getAllOrdersByRange.getOrdersByRange);
 router.post('/deleteHairStyle', deleteHairStyles.deleteMisuko);
 router.post('/edit_hairStyle', validateEditMsuko, editMsuko);
 router.post('/edit_hairDresser', validateEditHairDresser, editHairDresser);
