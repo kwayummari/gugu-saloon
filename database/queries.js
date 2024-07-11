@@ -84,6 +84,64 @@ WHERE user.role != 1 AND user.companyId = ?;
   checkForHairStyle: 'SELECT * FROM hairStyle WHERE name = ? AND id = ? LIMIT 1',
   edit_Hairstyle: `UPDATE hairStyle SET name = ?, amount = ?, description = ?, officeAmount = ?, hairDresserAmount = ?, costOfHair = ?, vishanga = ?, remainderAmount = ? WHERE id = ?`,
   getHairStyles: 'SELECT * FROM hairStyle WHERE companyId = ?',
+  getOrders: `SELECT 
+    results.hairDresserName,
+    results.totalHairDresserAmount,
+    results.totalOfficeAmount,
+    totals.totalOfficeAmount AS overallTotalOfficeAmount
+FROM 
+    (SELECT 
+        hd.name AS hairDresserName,
+        SUM(hs.HairDresserAmount) AS totalHairDresserAmount,
+        SUM(hs.officeAmount) AS totalOfficeAmount
+    FROM 
+        orders o
+    JOIN 
+        hairStyle hs ON o.hairstyleId = hs.id
+    JOIN 
+        hairdresser hd ON o.hairDresserId = hd.id
+    WHERE 
+        DATE(o.date) = CURRENT_DATE
+    GROUP BY 
+        hd.name) AS results,
+    (SELECT 
+        SUM(hs.officeAmount) AS totalOfficeAmount
+    FROM 
+        orders o
+    JOIN 
+        hairStyle hs ON o.hairstyleId = hs.id
+    WHERE 
+        DATE(o.date) = CURRENT_DATE) AS totals
+`,
+getOrdersByRange: `SELECT 
+    results.hairDresserName,
+    results.totalHairDresserAmount,
+    results.totalOfficeAmount,
+    totals.totalOfficeAmount AS overallTotalOfficeAmount
+FROM 
+    (SELECT 
+        hd.name AS hairDresserName,
+        SUM(hs.HairDresserAmount) AS totalHairDresserAmount,
+        SUM(hs.officeAmount) AS totalOfficeAmount
+    FROM 
+        orders o
+    JOIN 
+        hairStyle hs ON o.hairstyleId = hs.id
+    JOIN 
+        hairdresser hd ON o.hairDresserId = hd.id
+    WHERE 
+        o.date BETWEEN ? AND ?
+    GROUP BY 
+        hd.name) AS results,
+    (SELECT 
+        SUM(hs.officeAmount) AS totalOfficeAmount
+    FROM 
+        orders o
+    JOIN 
+        hairStyle hs ON o.hairstyleId = hs.id
+    WHERE 
+        o.date BETWEEN ? AND ?) AS totals
+`,
   getHairstyleById: 'SELECT * FROM hairStyle WHERE id = ?',
   check_for_hairdresser: 'SELECT * FROM hairDressing WHERE hairStyleId = ? AND hairdresserId = ?  LIMIT 1',
   register_hairdressing: 'INSERT INTO hairDressing (hairStyleId, hairdresserId) VALUES (?, ?)',
