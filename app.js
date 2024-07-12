@@ -77,7 +77,6 @@ app.get('/', (req, res) => {
   res.send('Welcome To GUGU API!');
 });
 
-// const PORT = process.env.API_PORT || 8080;
 const PORT = process.env.API_PORT;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
