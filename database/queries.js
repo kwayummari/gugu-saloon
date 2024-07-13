@@ -6,12 +6,14 @@ const queries = {
   INNER JOIN roles ON user.role = roles.id
   WHERE user.role != 1;
 `,
-  getAllUsersByCompany: `
-SELECT user.*, branch.name AS branch_name, roles.name AS role_name
+  getAllUsersByCompany: `SELECT user.*, branch.name AS branch_name, roles.name AS role_name,
+       (SELECT COUNT(*) 
+        FROM user 
+        WHERE user.role != 1 AND user.companyId = '1') AS totalUsers
 FROM user
 INNER JOIN branch ON user.branch = branch.id
 INNER JOIN roles ON user.role = roles.id
-WHERE user.role != 1 AND user.companyId = ?;
+WHERE user.role != 1 AND user.companyId = '1';
 `,
   getUserById: 'SELECT * FROM user WHERE id = ?',
   login: 'SELECT * FROM user WHERE email = ?',

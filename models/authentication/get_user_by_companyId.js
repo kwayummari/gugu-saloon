@@ -11,7 +11,7 @@ const getUserByCompanyId = async (req, res) => {
         console.error('Error fetching user:', error);
         return res.status(500).json({ message: 'Internal Server Error' });
       }
-
+      console.log(results)
       if (results.length === 0) {
         return res.status(404).json({ message: 'User not found' });
       }
