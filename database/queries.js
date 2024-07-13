@@ -71,9 +71,9 @@ WHERE user.role != 1 AND user.companyId = ?;
   check_hairdresser_existence: 'SELECT * FROM hairdresser WHERE name = ? AND companyId = ? LIMIT 1',
   check_edit_hairdresser_existence: 'SELECT * FROM hairdresser WHERE name = ? AND id = ? LIMIT 1',
   check_delete_hairdresser_existence: 'SELECT * FROM hairdresser WHERE id = ? LIMIT 1',
-  check_hairdressing_existence: 'SELECT * FROM hairdressing WHERE id = ? LIMIT 1',
-  disable_Hairdressing: 'UPDATE hairdressing SET status = ? WHERE id = ?',
-  delete_hairdresser_hairstyling_Hairdressing: 'DELETE FROM hairdressing WHERE id = ?',
+  check_hairdressing_existence: 'SELECT * FROM hairDressing WHERE id = ? LIMIT 1',
+  disable_Hairdressing: 'UPDATE hairDressing SET status = ? WHERE id = ?',
+  delete_hairdresser_hairstyling_Hairdressing: 'DELETE FROM hairDressing WHERE id = ?',
   delete_Hairdresser: 'DELETE FROM hairdresser WHERE id = ?',
   edit_hairdresser: 'UPDATE hairdresser SET name = ? WHERE id = ?',
   register_hairdresser: 'INSERT INTO hairdresser (name, companyId) VALUES (?, ?)',
@@ -201,9 +201,9 @@ ORDER BY
   getHairstyleById: 'SELECT * FROM hairStyle WHERE id = ?',
   check_for_hairdresser: 'SELECT * FROM hairDressing WHERE hairStyleId = ? AND hairdresserId = ?  LIMIT 1',
   register_hairdressing: 'INSERT INTO hairDressing (hairStyleId, hairdresserId) VALUES (?, ?)',
-  get_hairdressing: `SELECT hairDressing.*, hairDresser.name AS hairDresserName
+  get_hairdressing: `SELECT hairDressing.*, hairdresser.name AS hairDresserName
   FROM hairDressing
-  JOIN hairDresser ON hairDressing.hairDresserId = hairDresser.id
+  JOIN hairdresser ON hairDressing.hairDresserId = hairdresser.id
   WHERE hairDressing.hairStyleId = ?;
   `,
   add_order: 'INSERT INTO orders (name, phone, hairStyleId, hairDresserId) VALUES (?, ?, ?, ?)',

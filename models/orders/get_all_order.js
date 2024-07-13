@@ -12,7 +12,7 @@ const getOrders = async (req, res) => {
       }
 
       if (results.length === 0) {
-        return res.status(404).json({ message: 'No orders found' });
+        return res.status(404).json({ message: 'No orders were recorded today' });
       }
 
       // Transform the results into the desired JSON structure
