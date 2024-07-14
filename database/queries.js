@@ -65,9 +65,9 @@ WHERE user.role != 1 AND user.companyId = '1';
   get_branch: 'SELECT * FROM branch WHERE companyId = ? AND id = ?',
   get_inventory: 'SELECT * FROM inventory WHERE id = ?',
   getHairDresser: 'SELECT * FROM hairdresser WHERE companyId = ?',
-  getHairDresserById: `SELECT hairDressing.*, hairDresser.name AS hairDresserName
+  getHairDresserById: `SELECT hairDressing.*, hairdresser.name AS hairDresserName
   FROM hairDressing
-  INNER JOIN hairDresser ON hairDressing.hairDresserId = hairDresser.id
+  INNER JOIN hairdresser ON hairDressing.hairDresserId = hairdresser.id
   WHERE hairDressing.hairStyleId = ?
   `,
   check_hairdresser_existence: 'SELECT * FROM hairdresser WHERE name = ? AND companyId = ? LIMIT 1',
