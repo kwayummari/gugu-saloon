@@ -5,6 +5,7 @@ const {validateLoginHairDresser,loginHairDresser} = require('../models/authentic
 const {validateUser,registerUser} = require('../models/authentication/register_user');
 const getUsers = require('../models/authentication/get_users');
 const getPermissions = require('../models/permissions/get_permission')
+const getUserById = require('../models/authentication/get_user_by_id')
 const getAllRoles = require('../models/roles/get_roles')
 const getRolesById = require('../models/roles/get_roles_by_id')
 const getUserByCompanyId = require('../models/authentication/get_user_by_companyId')
@@ -51,6 +52,7 @@ router.post('/login', validateLogin, loginUser);
 router.post('/loginHairDresser',validateLoginHairDresser,loginHairDresser);
 router.post('/register_user',validateUser, registerUser);
 router.get('/users', getUsers.getAllUsers);
+router.post('/getUserById', getUserById.getUserById);
 router.post('/getUserByCompanyId', getUserByCompanyId.getUserByCompanyId);
 router.post('/getPermission', getPermissions.getPermissions);
 router.get('/getRoles', getAllRoles.getRoles);
