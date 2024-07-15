@@ -15,7 +15,7 @@ INNER JOIN branch ON user.branch = branch.id
 INNER JOIN roles ON user.role = roles.id
 WHERE user.role != 1 AND user.companyId = '1';
 `,
-  getUserById: 'SELECT * FROM user WHERE id = ?',
+  getUserById: 'SELECT * FROM hairdresser WHERE id = ?',
   login: 'SELECT * FROM user WHERE email = ?',
   loginHairDresser: 'SELECT * FROM hairdresser WHERE name = ?',
   register_user: 'INSERT INTO user (fullname, phone, email, branch, role, password, companyId) VALUES (?, ?, ?, ?, ?, ?, ?)',

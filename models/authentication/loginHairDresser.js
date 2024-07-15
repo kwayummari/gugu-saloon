@@ -22,15 +22,13 @@ const loginHairDresser = async (req, res) => {
       const firstError = errors.array()[0];
       return res.status(300).json({ message: firstError.msg });
     }
-    const { password } = req.body;
-    const name = 'Asha Mohamed';
+    const { name, password } = req.body;
     const connectionPool = await connectionPoolWithRetry();
     connectionPool.query(
       queries.loginHairDresser,
       [name],
       async (error, results) => {
         if (error) {
-          console.log(error)
           return res.status(500).json({ message: error.message });
         }
 

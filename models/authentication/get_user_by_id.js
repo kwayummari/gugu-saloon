@@ -5,8 +5,8 @@ const getUserById = async (req, res) => {
   try {
     const connectionPool = await connectionPoolWithRetry();
 
-      const userId = req.params.id;
-    connectionPool.query(queries.getUserById, [userId], (error, results) => {
+    const { id } = req.body;
+    connectionPool.query(queries.getUserById, [id], (error, results) => {
       if (error) {
         console.error('Error fetching user:', error);
         return res.status(500).json({ message: 'Internal Server Error' });
