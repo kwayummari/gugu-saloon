@@ -23,6 +23,8 @@ const loginHairDresser = async (req, res) => {
       return res.status(300).json({ message: firstError.msg });
     }
     const { name, password } = req.body;
+    console.log(name)
+    console.log(password)
     const connectionPool = await connectionPoolWithRetry();
     connectionPool.query(
       queries.loginHairDresser,
@@ -33,7 +35,7 @@ const loginHairDresser = async (req, res) => {
         }
 
         if (results.length === 0) {
-          return res.status(400).json({ message: 'Invalid credentials' });
+          return res.status(400).json({ message: 'User not found' });
         }
 
         const user = results[0];
