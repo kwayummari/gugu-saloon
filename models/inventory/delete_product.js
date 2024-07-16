@@ -7,14 +7,14 @@ const deleteProduct = async (req, res) => {
 
         const id = req.body.id;
         connectionPool.query(
-            queries.check_inventory_existence,
+            queries.check_inventory_existence_for_deleting,
             [id],
             (error, result) => {
                 if (error) {
                     return res.status(500).json({ message: error.message });
                 }
-                if (result.length > 0) {
-                    return res.status(400).json({ message: "Product can't be deleted right now" });
+                if (result.length < 0) {
+                    return res.status(400).json({ message: "Product does not exist" });
                 }
                 connectionPool.query(queries.deleteProduct, [id], (error, results) => {
                     if (error) {
