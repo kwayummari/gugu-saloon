@@ -93,7 +93,10 @@ WHERE user.role != 1 AND user.companyId = '1';
         o.name AS orderName,
         o.date AS orderDate,
         hs.HairDresserAmount,
-        hs.officeAmount
+        hs.officeAmount,
+        hs.description,
+        hs.costOfHair,
+        hs.vishanga
     FROM 
         orders o
     JOIN 
@@ -134,7 +137,12 @@ SELECT
     ha.totalOfficeAmount,
     toa.overallTotalOfficeAmount,
     od.orderName,
-    od.orderDate
+    od.orderDate,
+    od.description,
+    od.costOfHair,
+    od.vishanga,
+    od.HairDresserAmount,
+    od.officeAmount
 FROM 
     HairDresserAggregates ha
 JOIN 
@@ -149,9 +157,11 @@ getOrdersByRange: `WITH OrderDetails AS (
         o.hairDresserId,
         o.name AS orderName,
         o.date AS orderDate,
-        hs.name AS hairstyleName,
-        hs.HairDresserAmount,
-        hs.officeAmount
+        hs.hairDresserAmount,
+        hs.officeAmount,
+        hs.description,
+        hs.costOfHair,
+        hs.vishanga
     FROM 
         orders o
     JOIN 
@@ -163,7 +173,7 @@ HairDresserAggregates AS (
     SELECT 
         hd.id AS hairDresserId,
         hd.name AS hairDresserName,
-        SUM(hs.HairDresserAmount) AS totalHairDresserAmount,
+        SUM(hs.hairDresserAmount) AS totalHairDresserAmount,
         SUM(hs.officeAmount) AS totalOfficeAmount
     FROM 
         orders o
@@ -193,7 +203,11 @@ SELECT
     toa.overallTotalOfficeAmount,
     od.orderName,
     od.orderDate,
-    od.hairstyleName
+    od.description,
+    od.costOfHair,
+    od.vishanga,
+    od.hairDresserAmount,
+    od.officeAmount
 FROM 
     HairDresserAggregates ha
 JOIN 
