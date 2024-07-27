@@ -144,11 +144,12 @@ JOIN
 ORDER BY 
     ha.hairDresserName, od.orderDate;
 `,
-    getOrdersByRange: `WITH OrderDetails AS (
+getOrdersByRange: `WITH OrderDetails AS (
     SELECT 
         o.hairDresserId,
         o.name AS orderName,
         o.date AS orderDate,
+        hs.name AS hairstyleName,
         hs.HairDresserAmount,
         hs.officeAmount
     FROM 
@@ -191,7 +192,8 @@ SELECT
     ha.totalOfficeAmount,
     toa.overallTotalOfficeAmount,
     od.orderName,
-    od.orderDate
+    od.orderDate,
+    od.hairstyleName
 FROM 
     HairDresserAggregates ha
 JOIN 
