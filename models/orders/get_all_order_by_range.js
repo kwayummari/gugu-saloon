@@ -18,9 +18,6 @@ const getOrdersByRange = async (req, res) => {
           return res.status(404).json({ message: 'No orders found' });
         }
 
-        // Log the results to see their structure
-        console.log('Query Results:', results);
-
         let overallTotalOfficeAmount = 0;
         const hairDresserDict = {};
 
