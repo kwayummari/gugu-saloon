@@ -13,10 +13,16 @@ const getOrders = async (req, res) => {
         return res.status(404).json({ message: 'No orders were recorded today' });
       }
       let overallTotalOfficeAmount = 0;
+      let overallTotalVishanga = 0;
+      let overallTotalCostOfHair = 0;
+      let overallTotalHairDresserAmount = 0;
       const hairDresserDict = {};
       results.forEach(row => {
         if (overallTotalOfficeAmount === 0) {
           overallTotalOfficeAmount = row.overallTotalOfficeAmount;
+          overallTotalVishanga = row.overallTotalVishanga;
+          overallTotalCostOfHair = row.overallTotalCostOfHair;
+          overallTotalHairDresserAmount = row.overallTotalHairDresserAmount;
         }
         if (!hairDresserDict[row.hairDresserName]) {
           hairDresserDict[row.hairDresserName] = {
@@ -41,6 +47,9 @@ const getOrders = async (req, res) => {
       res.status(200).json({
         message: 'Orders fetched successfully',
         overallTotalOfficeAmount: overallTotalOfficeAmount,
+        overallTotalVishanga: overallTotalVishanga,
+        overallTotalCostOfHair: overallTotalCostOfHair,
+        overallTotalHairDresserAmount: overallTotalHairDresserAmount,
         orders: orders
       });
     });

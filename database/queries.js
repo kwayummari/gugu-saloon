@@ -123,7 +123,10 @@ HairDresserAggregates AS (
 ),
 TotalOfficeAmount AS (
     SELECT 
-        SUM(hs.officeAmount) AS overallTotalOfficeAmount
+        SUM(hs.officeAmount) AS overallTotalOfficeAmount,
+        SUM(hs.hairDresserAmount) AS overallTotalHairDresserAmount,
+        SUM(hs.costOfHair) AS overallTotalCostOfHair,
+        SUM(hs.vishanga) AS overallTotalVishanga
     FROM 
         orders o
     JOIN 
@@ -136,6 +139,9 @@ SELECT
     ha.totalHairDresserAmount,
     ha.totalOfficeAmount,
     toa.overallTotalOfficeAmount,
+    toa.overallTotalHairDresserAmount,
+    toa.overallTotalCostOfHair,
+    toa.overallTotalVishanga,
     od.orderName,
     od.orderDate,
     od.description,
@@ -188,7 +194,10 @@ HairDresserAggregates AS (
 ),
 TotalOfficeAmount AS (
     SELECT 
-        SUM(hs.officeAmount) AS overallTotalOfficeAmount
+        SUM(hs.officeAmount) AS overallTotalOfficeAmount,
+        SUM(hs.hairDresserAmount) AS overallTotalHairDresserAmount,
+        SUM(hs.costOfHair) AS overallTotalCostOfHair,
+        SUM(hs.vishanga) AS overallTotalVishanga
     FROM 
         orders o
     JOIN 
@@ -201,6 +210,9 @@ SELECT
     ha.totalHairDresserAmount,
     ha.totalOfficeAmount,
     toa.overallTotalOfficeAmount,
+    toa.overallTotalHairDresserAmount,
+    toa.overallTotalCostOfHair,
+    toa.overallTotalVishanga,
     od.orderName,
     od.orderDate,
     od.description,
