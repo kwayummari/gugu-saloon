@@ -14,7 +14,8 @@ const validateOrder = [
         .if(body('phone').exists()).isString().withMessage('Phone number must be a string')
         .if(body('phone').isString()).isLength({ max: 10 }).withMessage('Phone number must be at most 10 characters'),
     body('hairStyleId').trim().notEmpty().withMessage('Hair style is required'),
-    body('hairDresserId').trim().notEmpty().withMessage('Hair dresser is required')
+    body('hairDresserId').trim().notEmpty().withMessage('Hair dresser is required'),
+    body('randomNumber').trim().notEmpty().withMessage('Receipt Number is required')
 ];
 
 const registerOrder = async (req, res) => {
@@ -24,11 +25,11 @@ const registerOrder = async (req, res) => {
             const firstError = errors.array()[0];
             return res.status(300).json({ message: firstError.msg });
         }
-        const { name, phone, hairStyleId, hairDresserId } = req.body;
+        const { name, phone, hairStyleId, hairDresserId, randomNumber } = req.body;
         const connectionPool = await connectionPoolWithRetry();
         connectionPool.query(
             queries.add_order,
-            [name, phone, hairStyleId, hairDresserId],
+            [name, phone, hairStyleId, hairDresserId, randomNumber],
             (error, result) => {
                 if (error) {
                     console.log(error);

@@ -237,7 +237,7 @@ ORDER BY
   JOIN hairdresser ON hairDressing.hairDresserId = hairdresser.id
   WHERE hairDressing.hairStyleId = ?;
   `,
-    add_order: 'INSERT INTO orders (name, phone, hairStyleId, hairDresserId) VALUES (?, ?, ?, ?)',
+    add_order: 'INSERT INTO orders (name, phone, hairStyleId, hairDresserId, receiptNumber) VALUES (?, ?, ?, ?, ?)',
 };
 
 module.exports = queries;
