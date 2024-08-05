@@ -38,13 +38,12 @@ const getOrdersByRange = async (req, res) => {
           hairDresserDict[row.hairDresserName].orders.push({
             name: row.orderName,
             date: row.orderDate,
-            hairstyleName: row.hairstyleName,
+            receiptNumber: row.receiptNumber,
             description: row.description,
             costOfHair: row.costOfHair,
             vishanga: row.vishanga,
             hairDresserAmount: row.hairDresserAmount,
-            officeAmount: row.officeAmount,
-            receiptNumber: row.receiptNumber
+            officeAmount: row.officeAmount
           });
         });
         const orders = Object.values(hairDresserDict);

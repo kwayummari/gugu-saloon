@@ -92,6 +92,7 @@ WHERE user.role != 1 AND user.companyId = '1';
         o.hairDresserId,
         o.name AS orderName,
         o.date AS orderDate,
+        o.receiptNumber AS receiptNumber,
         hs.HairDresserAmount,
         hs.officeAmount,
         hs.description,
@@ -148,7 +149,8 @@ SELECT
     od.costOfHair,
     od.vishanga,
     od.HairDresserAmount,
-    od.officeAmount
+    od.officeAmount,
+    od.receiptNumber
 FROM 
     HairDresserAggregates ha
 JOIN 
