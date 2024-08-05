@@ -163,6 +163,7 @@ getOrdersByRange: `WITH OrderDetails AS (
         o.hairDresserId,
         o.name AS orderName,
         o.date AS orderDate,
+        o.receiptNumber AS receiptNumber,
         hs.hairDresserAmount,
         hs.officeAmount,
         hs.description,
@@ -219,7 +220,8 @@ SELECT
     od.costOfHair,
     od.vishanga,
     od.hairDresserAmount,
-    od.officeAmount
+    od.officeAmount,
+    od.receiptNumber
 FROM 
     HairDresserAggregates ha
 JOIN 

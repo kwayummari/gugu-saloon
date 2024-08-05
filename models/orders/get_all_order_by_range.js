@@ -43,7 +43,8 @@ const getOrdersByRange = async (req, res) => {
             costOfHair: row.costOfHair,
             vishanga: row.vishanga,
             hairDresserAmount: row.hairDresserAmount,
-            officeAmount: row.officeAmount
+            officeAmount: row.officeAmount,
+            receiptNumber: row.receiptNumber
           });
         });
         const orders = Object.values(hairDresserDict);
