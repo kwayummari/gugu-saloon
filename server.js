@@ -71,7 +71,7 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-senjaro', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-app.use('/', routes);
+app.use('/api/', routes);
 
 app.get('/', (req, res) => {
   res.send('Welcome To GUGU API!');
