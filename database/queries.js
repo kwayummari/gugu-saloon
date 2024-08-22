@@ -242,7 +242,7 @@ ORDER BY
   WHERE hairDressing.hairStyleId = ?;
   `,
     add_order: 'INSERT INTO orders (name, phone, hairStyleId, hairDresserId, receiptNumber) VALUES (?, ?, ?, ?, ?)',
-    getExpenses: 'SELECT * FROM expenses',
+    getExpenses: 'SELECT * FROM expenses WHERE companyId = ?',
 };
 
 module.exports = queries;
