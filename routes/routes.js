@@ -47,7 +47,8 @@ const { validateEditHairDresser, editHairDresser } = require('../models/hairdres
 const { validateHairdressers, postHairDresser } = require('../models/hairdresser/post_hairdresser');
 const getHairDressings = require('../models/hairdresser/get_hairdressing');
 const { validateOrder, registerOrder } = require('../models/orders/add_order');
-const getExpenses = require('../models/expenses/get_expenses')
+const getExpenses = require('../models/expenses/get_expenses');
+const { validateExpenses, addExpenses } = require('../models/expenses/add_expenses');
 
 router.post('/login', validateLogin, loginUser);
 router.post('/loginHairDresser',validateLoginHairDresser,loginHairDresser);
@@ -98,5 +99,6 @@ router.post('/post_hairDresser', validateHairdressers, postHairDresser);
 router.post('/getHairDressing', getHairDressings.getHairDressing);
 router.post('/addOrder', validateOrder, registerOrder);
 router.post('/getExpenses', getExpenses.getExpenses);
+router.post('/add_expenses', validateExpenses, addExpenses);
 
 module.exports = router;
