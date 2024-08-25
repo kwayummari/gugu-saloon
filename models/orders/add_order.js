@@ -25,11 +25,11 @@ const registerOrder = async (req, res) => {
             const firstError = errors.array()[0];
             return res.status(300).json({ message: firstError.msg });
         }
-        const { name, phone, hairStyleId, hairDresserId, randomNumber } = req.body;
+        const { name, phone, hairStyleId, hairDresserId, randomNumber, companyId, branchId } = req.body;
         const connectionPool = await connectionPoolWithRetry();
         connectionPool.query(
             queries.add_order,
-            [name, phone, hairStyleId, hairDresserId, randomNumber],
+            [name, phone, hairStyleId, hairDresserId, randomNumber, companyId, branchId],
             (error, result) => {
                 if (error) {
                     console.log(error);

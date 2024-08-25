@@ -241,7 +241,7 @@ ORDER BY
   JOIN hairdresser ON hairDressing.hairDresserId = hairdresser.id
   WHERE hairDressing.hairStyleId = ?;
   `,
-    add_order: 'INSERT INTO orders (name, phone, hairStyleId, hairDresserId, receiptNumber) VALUES (?, ?, ?, ?, ?)',
+    add_order: 'INSERT INTO orders (name, phone, hairStyleId, hairDresserId, receiptNumber, companyId, branchId) VALUES (?, ?, ?, ?, ?, ?, ?)',
     getExpenses: 'SELECT * FROM expenses_type WHERE companyId = ?',
     addExpenses: 'INSERT INTO expenses (expense_type_id, amount, branchId, companyId) VALUES (?, ?, ?, ?)'
 };
