@@ -86,7 +86,7 @@ WHERE user.role != 1 AND user.companyId = '1';
     deleteMsuko: 'DELETE FROM hairStyle WHERE id = ?',
     checkForHairStyle: 'SELECT * FROM hairStyle WHERE name = ? AND id = ? LIMIT 1',
     edit_Hairstyle: `UPDATE hairStyle SET name = ?, amount = ?, description = ?, officeAmount = ?, hairDresserAmount = ?, costOfHair = ?, vishanga = ?, remainderAmount = ? WHERE id = ?`,
-    getHairStyles: 'SELECT * FROM hairStyle WHERE companyId = ?',
+    getHairStyles: 'SELECT * FROM hairStyle WHERE companyId = ? AND branchId = ?',
     getOrders: `WITH OrderDetails AS (
     SELECT 
         o.hairDresserId,
