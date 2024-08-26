@@ -208,6 +208,14 @@ TotalOfficeAmount AS (
     WHERE 
         o.companyId = ? AND o.branchId = ? AND o.date BETWEEN ? AND ?
 )
+ExpensesTotal AS (
+    SELECT 
+        SUM(e.amount) AS actualTotalProfit
+    FROM 
+        expenses e
+    WHERE 
+        e.companyId = ? AND e.branchId = ? AND e.date BETWEEN ? AND ?
+)
 SELECT 
     ha.hairDresserName,
     ha.totalHairDresserAmount,
