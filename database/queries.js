@@ -135,13 +135,14 @@ JOIN
         hs.officeAmount,
         hs.description,
         hs.costOfHair,
-        hs.vishanga
+        hs.vishanga,
+        hs.name AS hairstyleName
     FROM 
         orders o
     JOIN 
         hairStyle hs ON o.hairstyleId = hs.id
     WHERE 
-        DATE(o.date) = CURRENT_DATE
+        e.companyId = ? AND e.branchId = ? AND DATE(o.date) = CURRENT_DATE
 ),
 HairDresserAggregates AS (
     SELECT 
@@ -156,7 +157,7 @@ HairDresserAggregates AS (
     JOIN 
         hairdresser hd ON o.hairDresserId = hd.id
     WHERE 
-        DATE(o.date) = CURRENT_DATE
+        e.companyId = ? AND e.branchId = ? AND DATE(o.date) = CURRENT_DATE
     GROUP BY 
         hd.id, hd.name
 ),
@@ -171,7 +172,15 @@ TotalOfficeAmount AS (
     JOIN 
         hairStyle hs ON o.hairstyleId = hs.id
     WHERE 
-        DATE(o.date) = CURRENT_DATE
+        e.companyId = ? AND e.branchId = ? AND DATE(o.date) = CURRENT_DATE
+),
+TotalExpenses AS (
+    SELECT 
+        SUM(e.amount) AS overallTotalExpenses
+    FROM 
+        expenses e
+    WHERE 
+        e.companyId = ? AND e.branchId = ? AND DATE(e.date) = CURRENT_DATE
 )
 SELECT 
     ha.hairDresserName,
@@ -181,8 +190,11 @@ SELECT
     toa.overallTotalHairDresserAmount,
     toa.overallTotalCostOfHair,
     toa.overallTotalVishanga,
+    te.overallTotalExpenses,
+    (toa.overallTotalOfficeAmount - te.overallTotalExpenses) AS actualTotalProfit,
     od.orderName,
     od.orderDate,
+    od.hairstyleName,
     od.description,
     od.costOfHair,
     od.vishanga,
@@ -195,6 +207,8 @@ JOIN
     OrderDetails od ON ha.hairDresserId = od.hairDresserId
 JOIN 
     TotalOfficeAmount toa
+JOIN 
+    TotalExpenses te
 ORDER BY 
     ha.hairDresserName, od.orderDate;
 `,

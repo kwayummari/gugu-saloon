@@ -3,10 +3,11 @@ const queries = require('../../database/queries');
 
 const getOrders = async (req, res) => {
   try {
+    const { companyId, branchId } = req.body;
     const connectionPool = await connectionPoolWithRetry();
-    connectionPool.query(queries.getOrders, [], (error, results) => {
+    connectionPool.query(queries.getOrders, [companyId, branchId,companyId, branchId,companyId, branchId,companyId, branchId], (error, results) => {
       if (error) {
-        console.error('Error fetching hair style:', error);
+        console.error('Error fetching orders:', error);
         return res.status(500).json({ message: 'Internal Server Error' });
       }
       if (results.length === 0) {
@@ -16,13 +17,18 @@ const getOrders = async (req, res) => {
       let overallTotalVishanga = 0;
       let overallTotalCostOfHair = 0;
       let overallTotalHairDresserAmount = 0;
+      let overallTotalExpenses = 0;
+      let actualTotalProfit = 0;
       const hairDresserDict = {};
+
       results.forEach(row => {
         if (overallTotalOfficeAmount === 0) {
           overallTotalOfficeAmount = row.overallTotalOfficeAmount;
           overallTotalVishanga = row.overallTotalVishanga;
           overallTotalCostOfHair = row.overallTotalCostOfHair;
           overallTotalHairDresserAmount = row.overallTotalHairDresserAmount;
+          overallTotalExpenses = row.overallTotalExpenses;
+          actualTotalProfit = row.actualTotalProfit;
         }
         if (!hairDresserDict[row.hairDresserName]) {
           hairDresserDict[row.hairDresserName] = {
@@ -44,6 +50,7 @@ const getOrders = async (req, res) => {
           receiptNumber: row.receiptNumber
         });
       });
+
       const orders = Object.values(hairDresserDict);
       res.status(200).json({
         message: 'Orders fetched successfully',
@@ -51,6 +58,8 @@ const getOrders = async (req, res) => {
         overallTotalVishanga: overallTotalVishanga,
         overallTotalCostOfHair: overallTotalCostOfHair,
         overallTotalHairDresserAmount: overallTotalHairDresserAmount,
+        overallTotalExpenses: overallTotalExpenses,
+        actualTotalProfit: actualTotalProfit,
         orders: orders
       });
     });
@@ -59,6 +68,7 @@ const getOrders = async (req, res) => {
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
 module.exports = {
   getOrders,
 };
