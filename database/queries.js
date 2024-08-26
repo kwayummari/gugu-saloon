@@ -212,7 +212,7 @@ JOIN
 ORDER BY 
     ha.hairDresserName, od.orderDate;
 `,
-getOrdersByRange: `WITH OrderDetails AS (
+    getOrdersByRange: `WITH OrderDetails AS (
     SELECT 
         o.hairDresserId,
         o.name AS orderName,
@@ -295,6 +295,21 @@ JOIN
     ExpensesTotal et
 ORDER BY 
     ha.hairDresserName, od.orderDate;
+`,
+getExpensesByRange: `SELECT 
+    e.*, 
+    expenses_type.name AS expenseTypeName, 
+    branch.name AS branchName
+FROM 
+    expenses e
+JOIN 
+    expenses_type ON e.expense_type_id = expenses_type.id
+JOIN 
+    branch ON e.branchId = branch.id
+WHERE 
+    e.companyId = ? 
+    AND e.branchId = ? 
+    AND e.date BETWEEN ? AND ?;
 `,
     getHairstyleById: 'SELECT * FROM hairStyle WHERE id = ?',
     check_for_hairdresser: 'SELECT * FROM hairDressing WHERE hairStyleId = ? AND hairdresserId = ?  LIMIT 1',
