@@ -176,7 +176,7 @@ getOrdersByRange: `WITH OrderDetails AS (
     JOIN 
         hairStyle hs ON o.hairstyleId = hs.id
     WHERE 
-        o.date BETWEEN ? AND ?
+        o.companyId = ? AND o.branchId = ? AND o.date BETWEEN ? AND ?
 ),
 HairDresserAggregates AS (
     SELECT 
@@ -191,7 +191,7 @@ HairDresserAggregates AS (
     JOIN 
         hairdresser hd ON o.hairDresserId = hd.id
     WHERE 
-        o.date BETWEEN ? AND ?
+        o.companyId = ? AND o.branchId = ? AND o.date BETWEEN ? AND ?
     GROUP BY 
         hd.id, hd.name
 ),
@@ -206,7 +206,7 @@ TotalOfficeAmount AS (
     JOIN 
         hairStyle hs ON o.hairstyleId = hs.id
     WHERE 
-        o.date BETWEEN ? AND ?
+        o.companyId = ? AND o.branchId = ? AND o.date BETWEEN ? AND ?
 )
 SELECT 
     ha.hairDresserName,

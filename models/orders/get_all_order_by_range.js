@@ -3,10 +3,10 @@ const queries = require('../../database/queries');
 
 const getOrdersByRange = async (req, res) => {
   try {
-    const { startDate, endDate } = req.body;
+    const { startDate, endDate, companyId, branchId } = req.body;
     const connectionPool = await connectionPoolWithRetry();
     connectionPool.query(queries.getOrdersByRange,
-      [startDate, endDate, startDate, endDate, startDate, endDate],
+      [companyId, branchId, startDate, endDate, companyId, branchId, startDate, endDate, companyId, branchId, startDate, endDate],
       (error, results) => {
         if (error) {
           console.error('Error fetching hair style:', error);
