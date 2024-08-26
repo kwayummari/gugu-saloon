@@ -207,10 +207,10 @@ TotalOfficeAmount AS (
         hairStyle hs ON o.hairstyleId = hs.id
     WHERE 
         o.companyId = ? AND o.branchId = ? AND o.date BETWEEN ? AND ?
-)
+),
 ExpensesTotal AS (
     SELECT 
-        SUM(e.amount) AS actualTotalProfit
+        SUM(e.amount) AS actualExpenses
     FROM 
         expenses e
     WHERE 
@@ -231,13 +231,16 @@ SELECT
     od.vishanga,
     od.hairDresserAmount,
     od.officeAmount,
-    od.receiptNumber
+    od.receiptNumber,
+    et.actualExpenses
 FROM 
     HairDresserAggregates ha
 JOIN 
     OrderDetails od ON ha.hairDresserId = od.hairDresserId
 JOIN 
     TotalOfficeAmount toa
+JOIN 
+    ExpensesTotal et
 ORDER BY 
     ha.hairDresserName, od.orderDate;
 `,
