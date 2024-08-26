@@ -142,7 +142,7 @@ JOIN
     JOIN 
         hairStyle hs ON o.hairstyleId = hs.id
     WHERE 
-        e.companyId = ? AND e.branchId = ? AND DATE(o.date) = CURRENT_DATE
+        o.companyId = ? AND o.branchId = ? AND DATE(o.date) = CURRENT_DATE
 ),
 HairDresserAggregates AS (
     SELECT 
@@ -157,7 +157,7 @@ HairDresserAggregates AS (
     JOIN 
         hairdresser hd ON o.hairDresserId = hd.id
     WHERE 
-        e.companyId = ? AND e.branchId = ? AND DATE(o.date) = CURRENT_DATE
+        o.companyId = ? AND o.branchId = ? AND DATE(o.date) = CURRENT_DATE
     GROUP BY 
         hd.id, hd.name
 ),
@@ -172,7 +172,7 @@ TotalOfficeAmount AS (
     JOIN 
         hairStyle hs ON o.hairstyleId = hs.id
     WHERE 
-        e.companyId = ? AND e.branchId = ? AND DATE(o.date) = CURRENT_DATE
+        o.companyId = ? AND o.branchId = ? AND DATE(o.date) = CURRENT_DATE
 ),
 TotalExpenses AS (
     SELECT 
