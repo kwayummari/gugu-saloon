@@ -109,7 +109,7 @@ JOIN
   INNER JOIN hairdresser ON hairDressing.hairDresserId = hairdresser.id
   WHERE hairDressing.hairStyleId = ?
   `,
-    check_hairdresser_existence: 'SELECT * FROM hairdresser WHERE name = ? AND companyId = ? LIMIT 1',
+    check_hairdresser_existence: 'SELECT * FROM hairdresser WHERE name = ? AND branchId = ? AND companyId = ? LIMIT 1',
     check_edit_hairdresser_existence: 'SELECT * FROM hairdresser WHERE name = ? AND id = ? LIMIT 1',
     check_delete_hairdresser_existence: 'SELECT * FROM hairdresser WHERE id = ? LIMIT 1',
     check_hairdressing_existence: 'SELECT * FROM hairDressing WHERE id = ? LIMIT 1',
@@ -117,7 +117,7 @@ JOIN
     delete_hairdresser_hairstyling_Hairdressing: 'DELETE FROM hairDressing WHERE id = ?',
     delete_Hairdresser: 'DELETE FROM hairdresser WHERE id = ?',
     edit_hairdresser: 'UPDATE hairdresser SET name = ? WHERE id = ?',
-    register_hairdresser: 'INSERT INTO hairdresser (name, companyId) VALUES (?, ?)',
+    register_hairdresser: 'INSERT INTO hairdresser (name, branchId, companyId) VALUES (?, ?, ?)',
     check_hairStyle_existence: 'SELECT * FROM hairStyle WHERE name = ? AND companyId = ? LIMIT 1',
     register_hairStyle: 'INSERT INTO hairStyle (name, amount, description, officeAmount, hairDresserAmount, costOfHair, vishanga, remainderAmount, companyId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
     check_hairStyle_existence_byId: 'SELECT * FROM hairDressing WHERE hairStyleId = ? LIMIT 1',

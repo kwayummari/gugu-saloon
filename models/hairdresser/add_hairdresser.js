@@ -15,12 +15,12 @@ const registerHairDresser = async (req, res) => {
             const firstError = errors.array()[0];
             return res.status(300).json({ message: firstError.msg });
         }
-        const { name, companyId } = req.body;
+        const { name, branch, companyId } = req.body;
         const connectionPool = await connectionPoolWithRetry();
 
         connectionPool.query(
             queries.check_hairdresser_existence,
-            [name, companyId],
+            [name, branch, companyId],
             (error, result) => {
                 if (error) {
                     return res.status(500).json({ message: error.message });
@@ -30,7 +30,7 @@ const registerHairDresser = async (req, res) => {
                 }
                 connectionPool.query(
                     queries.register_hairdresser,
-                    [name, companyId],
+                    [name, branch, companyId],
                     (error, result) => {
                         if (error) {
                             return res.status(500).json({ message: error.message });
