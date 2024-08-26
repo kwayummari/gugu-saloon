@@ -15,6 +15,44 @@ INNER JOIN branch ON user.branch = branch.id
 INNER JOIN roles ON user.role = roles.id
 WHERE user.role != 1 AND user.companyId = '1';
 `,
+    getAllCustomers: `WITH RankedOrders AS (
+    SELECT
+        o.name AS orderName,
+        o.hairStyleId,
+        o.phone,
+        ROW_NUMBER() OVER (
+            PARTITION BY o.name
+            ORDER BY COUNT(o.hairStyleId) DESC
+        ) AS rank
+    FROM
+        orders o
+    WHERE
+        o.companyId = ? AND o.branchId = ?
+    GROUP BY
+        o.name,
+        o.hairStyleId,
+        o.phone
+),
+MostFrequentHairStyle AS (
+    SELECT
+        ro.orderName,
+        ro.hairStyleId,
+        ro.phone
+    FROM
+        RankedOrders ro
+    WHERE
+        ro.rank = 1
+)
+SELECT
+    mf.orderName,
+    hs.name AS hairStyleName,
+    hs.amount AS hairStyleAmount,
+    mf.phone
+FROM
+    MostFrequentHairStyle mf
+JOIN
+    hairStyle hs ON mf.hairStyleId = hs.id;
+`,
     getUserById: 'SELECT * FROM hairdresser WHERE id = ?',
     login: 'SELECT * FROM user WHERE email = ?',
     loginHairDresser: 'SELECT * FROM hairdresser WHERE name = ?',
