@@ -20,6 +20,7 @@ const getOrdersByRange = async (req, res) => {
         let overallTotalCostOfHair = 0;
         let overallTotalHairDresserAmount = 0;
         let actualExpenses = 0;
+        let overallTotalAmountPaid = 0;
         const hairDresserDict = {};
         results.forEach(row => {
           if (overallTotalOfficeAmount === 0) {
@@ -28,12 +29,14 @@ const getOrdersByRange = async (req, res) => {
             overallTotalCostOfHair = row.overallTotalCostOfHair;
             overallTotalHairDresserAmount = row.overallTotalHairDresserAmount;
             actualExpenses = row.actualExpenses;
+            overallTotalAmountPaid = row.overallTotalAmountPaid;
           }
           if (!hairDresserDict[row.hairDresserName]) {
             hairDresserDict[row.hairDresserName] = {
               hairDresserName: row.hairDresserName,
               totalHairDresserAmount: row.totalHairDresserAmount,
               totalOfficeAmount: row.totalOfficeAmount,
+              overallTotalAmountPaid: row.overallTotalAmountPaid,
               orders: []
             };
           }
@@ -55,6 +58,7 @@ const getOrdersByRange = async (req, res) => {
           overallTotalVishanga: overallTotalVishanga,
           overallTotalCostOfHair: overallTotalCostOfHair,
           overallTotalHairDresserAmount: overallTotalHairDresserAmount,
+          overallTotalAmountPaid: overallTotalAmountPaid,
           actualExpenses: actualExpenses,
           orders: orders
         });

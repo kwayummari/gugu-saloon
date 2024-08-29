@@ -19,6 +19,7 @@ const getOrders = async (req, res) => {
       let overallTotalHairDresserAmount = 0;
       let overallTotalExpenses = 0;
       let actualTotalProfit = 0;
+      let overallTotalAmountPaid = 0;
       const hairDresserDict = {};
 
       results.forEach(row => {
@@ -29,12 +30,14 @@ const getOrders = async (req, res) => {
           overallTotalHairDresserAmount = row.overallTotalHairDresserAmount;
           overallTotalExpenses = row.overallTotalExpenses;
           actualTotalProfit = row.actualTotalProfit;
+          overallTotalAmountPaid = row.overallTotalAmountPaid;
         }
         if (!hairDresserDict[row.hairDresserName]) {
           hairDresserDict[row.hairDresserName] = {
             hairDresserName: row.hairDresserName,
             totalHairDresserAmount: row.totalHairDresserAmount,
             totalOfficeAmount: row.totalOfficeAmount,
+            overallTotalAmountPaid: row.overallTotalAmountPaid,
             orderNames: []
           };
         }
@@ -60,6 +63,7 @@ const getOrders = async (req, res) => {
         overallTotalHairDresserAmount: overallTotalHairDresserAmount,
         overallTotalExpenses: overallTotalExpenses,
         actualTotalProfit: actualTotalProfit,
+        overallTotalAmountPaid: overallTotalAmountPaid,
         orders: orders
       });
     });

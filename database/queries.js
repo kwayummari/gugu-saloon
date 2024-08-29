@@ -168,7 +168,8 @@ TotalOfficeAmount AS (
         SUM(hs.officeAmount) AS overallTotalOfficeAmount,
         SUM(hs.hairDresserAmount) AS overallTotalHairDresserAmount,
         SUM(hs.costOfHair) AS overallTotalCostOfHair,
-        SUM(hs.vishanga) AS overallTotalVishanga
+        SUM(hs.vishanga) AS overallTotalVishanga,
+        SUM(hs.amount) AS overallTotalAmountPaid
     FROM 
         orders o
     JOIN 
@@ -192,6 +193,7 @@ SELECT
     toa.overallTotalHairDresserAmount,
     toa.overallTotalCostOfHair,
     toa.overallTotalVishanga,
+    toa.overallTotalAmountPaid,
     te.overallTotalExpenses,
     (toa.overallTotalOfficeAmount - te.overallTotalExpenses) AS actualTotalProfit,
     od.orderName,
@@ -254,7 +256,8 @@ TotalOfficeAmount AS (
         SUM(hs.officeAmount) AS overallTotalOfficeAmount,
         SUM(hs.hairDresserAmount) AS overallTotalHairDresserAmount,
         SUM(hs.costOfHair) AS overallTotalCostOfHair,
-        SUM(hs.vishanga) AS overallTotalVishanga
+        SUM(hs.vishanga) AS overallTotalVishanga,
+        SUM(hs.amount) AS overallTotalAmountPaid
     FROM 
         orders o
     JOIN 
@@ -278,6 +281,7 @@ SELECT
     toa.overallTotalHairDresserAmount,
     toa.overallTotalCostOfHair,
     toa.overallTotalVishanga,
+    toa.overallTotalAmountPaid,
     od.orderName,
     od.orderDate,
     od.description,
