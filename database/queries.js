@@ -118,8 +118,11 @@ JOIN
     disable_Hairdressing: 'UPDATE hairDressing SET status = ? WHERE id = ?',
     delete_hairdresser_hairstyling_Hairdressing: 'DELETE FROM hairDressing WHERE id = ?',
     delete_Hairdresser: 'DELETE FROM hairdresser WHERE id = ?',
+    delete_hairdressing: 'DELETE FROM hairDressing WHERE hairdresserId = ?',
     edit_hairdresser: 'UPDATE hairdresser SET name = ? WHERE id = ?',
     register_hairdresser: 'INSERT INTO hairdresser (name, branchId, companyId) VALUES (?, ?, ?)',
+    get_all_hairstyle_ids: 'SELECT id FROM hairStyle',
+    bulk_register_hairdressing: 'INSERT INTO hairDressing (hairStyleId, hairdresserId) VALUES ?',
     check_hairStyle_existence: 'SELECT * FROM hairStyle WHERE name = ? AND companyId = ? LIMIT 1',
     register_hairStyle: 'INSERT INTO hairStyle (name, amount, description, officeAmount, hairDresserAmount, costOfHair, vishanga, remainderAmount, companyId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
     check_hairStyle_existence_byId: 'SELECT * FROM hairDressing WHERE hairStyleId = ? LIMIT 1',
@@ -325,6 +328,17 @@ WHERE
   JOIN hairdresser ON hairDressing.hairDresserId = hairdresser.id
   WHERE hairDressing.hairStyleId = ?;
   `,
+  get_hairdressing2: `SELECT 
+    hd.*,
+    hs.name AS hairStyleName
+FROM 
+    hairDressing hd
+JOIN 
+    hairStyle hs ON hd.hairStyleId = hs.id
+WHERE 
+    hd.hairdresserId = ? 
+    AND hd.status = 1;
+`,
     add_order: 'INSERT INTO orders (name, phone, hairStyleId, hairDresserId, receiptNumber, companyId, branchId) VALUES (?, ?, ?, ?, ?, ?, ?)',
     getExpenses: 'SELECT * FROM expenses_type WHERE companyId = ?',
     addExpenses: 'INSERT INTO expenses (expense_type_id, amount, branchId, companyId) VALUES (?, ?, ?, ?)'
