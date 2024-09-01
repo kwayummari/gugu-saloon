@@ -15,6 +15,7 @@ const getBranches = require('../models/branch/get_branch')
 const getRoles = require('../models/roles/get_all_roles')
 const deleteUserById = require('../models/authentication/delete_user')
 const deleteHairDresser = require('../models/hairdresser/delete_hairdresser')
+const updatesHairDressing = require('../models/hairdresser/update_hairdressing')
 const delete_hairdresser_hairstyling = require('../models/hairdresser/delete_hairdresser-hairstyling')
 const disableHairDressing = require('../models/hairdresser/disable_hairdresser')
 const { validateRole, registerRole } = require('../models/roles/add_roles');
@@ -72,6 +73,7 @@ router.post('/getBranch', getBranches.getBranch);
 router.post('/getAllRoles', getRoles.getRoles);
 router.post('/deleteUserById', deleteUserById.deleteUsersById)
 router.post('/deleteHairDresser', deleteHairDresser.deleteHairDresser)
+router.post('/updateHairDressingStatus', updatesHairDressing.updateHairDressing)
 router.post('/delete_hairdresser_hairstyling', delete_hairdresser_hairstyling.delete_hairdresser_hairstyling)
 router.post('/disable_hairdressing', disableHairDressing.disableHairdressing)
 router.post('/register_role', validateRole, registerRole);

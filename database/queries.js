@@ -114,6 +114,7 @@ JOIN
     check_hairdresser_existence: 'SELECT * FROM hairdresser WHERE name = ? AND branchId = ? AND companyId = ? LIMIT 1',
     check_edit_hairdresser_existence: 'SELECT * FROM hairdresser WHERE name = ? AND id = ? LIMIT 1',
     check_delete_hairdresser_existence: 'SELECT * FROM hairdresser WHERE id = ? LIMIT 1',
+    update_hairdressing: 'UPDATE hairDressing SET status = ? WHERE id = ?',
     check_hairdressing_existence: 'SELECT * FROM hairDressing WHERE id = ? LIMIT 1',
     disable_Hairdressing: 'UPDATE hairDressing SET status = ? WHERE id = ?',
     delete_hairdresser_hairstyling_Hairdressing: 'DELETE FROM hairDressing WHERE id = ?',
