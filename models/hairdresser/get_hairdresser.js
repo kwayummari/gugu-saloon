@@ -16,7 +16,6 @@ const getHairDressers = async (req, res) => {
         return res.status(404).json({ message: 'No hairdresser found' });
       }
 
-      // Fetch hairDressing details for each hairDresser
       const hairDressersWithHairDressing = await Promise.all(hairDresserResults.map(async (hairDresser) => {
         return new Promise((resolve, reject) => {
           connectionPool.query(
