@@ -10,7 +10,6 @@ const getHairDressers = async (req, res) => {
         console.error('Error fetching hairdresser:', error);
         return res.status(500).json({ message: 'Internal Server Error' });
       }
-
       if (hairDresserResults.length === 0) {
         return res.status(404).json({ message: 'No hairdresser found' });
       }
