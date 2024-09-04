@@ -5,7 +5,6 @@ const getHairDressers = async (req, res) => {
   try {
     const connectionPool = await connectionPoolWithRetry();
     const { companyId, branchId } = req.body;
-    
     connectionPool.query(queries.getHairDresser, [companyId, branchId], async (error, hairDresserResults) => {
       if (error) {
         console.error('Error fetching hairdresser:', error);
