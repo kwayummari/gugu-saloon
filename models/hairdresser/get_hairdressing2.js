@@ -12,6 +12,7 @@ const getHairDressing2 = async (req, res) => {
       }
 
       if (results.length === 0) {
+        console.log('Andrew ni boya sana')
         return res.status(404).json({ message: 'No hairdressing found' });
       }
       console.log(results)
