@@ -337,8 +337,7 @@ FROM
 JOIN 
     hairStyle hs ON hd.hairStyleId = hs.id
 WHERE 
-    hd.hairdresserId = ? 
-    AND hd.status = 1;
+    hd.hairdresserId = ?;
 `,
     add_order: 'INSERT INTO orders (name, phone, hairStyleId, hairDresserId, receiptNumber, companyId, branchId) VALUES (?, ?, ?, ?, ?, ?, ?)',
     getExpenses: 'SELECT * FROM expenses_type WHERE companyId = ?',
