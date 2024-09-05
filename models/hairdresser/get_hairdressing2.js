@@ -14,7 +14,7 @@ const getHairDressing2 = async (req, res) => {
       if (results.length === 0) {
         return res.status(404).json({ message: 'No hairdressing found' });
       }
-
+      console.log(results)
       res.status(200).json({ message: 'Hair dressing fetched successfully', hairDressing: results });
     });
   } catch (err) {
