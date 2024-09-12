@@ -41,7 +41,7 @@ const registerHairDresser = async (req, res) => {
                         const hairdresserId = result.insertId;  // Get the last inserted ID
 
                         // Fetch all hairStyle IDs
-                        connectionPool.query(queries.get_all_hairstyle_ids, [], (error, hairStyles) => {
+                        connectionPool.query(queries.get_all_hairstyle_ids, [branch], (error, hairStyles) => {
                             if (error) {
                                 return res.status(500).json({ message: error.message });
                             }

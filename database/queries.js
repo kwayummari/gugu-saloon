@@ -122,7 +122,7 @@ JOIN
     delete_hairdressing: 'DELETE FROM hairDressing WHERE hairdresserId = ?',
     edit_hairdresser: 'UPDATE hairdresser SET name = ? WHERE id = ?',
     register_hairdresser: 'INSERT INTO hairdresser (name, branchId, companyId) VALUES (?, ?, ?)',
-    get_all_hairstyle_ids: 'SELECT id FROM hairStyle',
+    get_all_hairstyle_ids: 'SELECT id FROM hairStyle WHERE branchId = ?',
     bulk_register_hairdressing: 'INSERT INTO hairDressing (hairStyleId, hairdresserId) VALUES ?',
     check_hairStyle_existence: 'SELECT * FROM hairStyle WHERE name = ? AND companyId = ? LIMIT 1',
     register_hairStyle: 'INSERT INTO hairStyle (name, amount, description, officeAmount, hairDresserAmount, costOfHair, vishanga, remainderAmount, companyId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
