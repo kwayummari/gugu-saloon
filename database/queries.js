@@ -17,7 +17,7 @@ WHERE user.role != 1 AND user.companyId = '1';
 `,
     getAllCustomersCount: `SELECT *
 FROM orders
-WHERE DATE(date) = CURDATE();
+WHERE DATE(date) = CURDATE() AND companyId = ? AND branchId = ?;
 `,
     getAllCustomers: `WITH RankedOrders AS (
     SELECT
