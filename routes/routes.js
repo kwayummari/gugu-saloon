@@ -10,6 +10,7 @@ const getAllRoles = require('../models/roles/get_roles')
 const getRolesById = require('../models/roles/get_roles_by_id')
 const getUserByCompanyId = require('../models/authentication/get_user_by_companyId')
 const getCustomers = require('../models/authentication/get_customers')
+const getCustomersCount = require('../models/authentication/get_customers_count')
 const updatePermissions = require('../models/permissions/update_permissions')
 const getBranches = require('../models/branch/get_branch')
 const getRoles = require('../models/roles/get_all_roles')
@@ -64,6 +65,7 @@ router.get('/users', getUsers.getAllUsers);
 router.post('/getUserById', getUserById.getUserById);
 router.post('/getUserByCompanyId', getUserByCompanyId.getUserByCompanyId);
 router.post('/getAllCustomers', getCustomers.getCustomers);
+router.post('/getAllCustomersCount', getCustomersCount.getCustomersCount);
 router.post('/getPermission', getPermissions.getPermissions);
 router.get('/getRoles', getAllRoles.getRoles);
 router.post('/updateRoles', updatePermissions.updatePermission);

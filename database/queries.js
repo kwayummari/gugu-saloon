@@ -15,6 +15,10 @@ INNER JOIN branch ON user.branch = branch.id
 INNER JOIN roles ON user.role = roles.id
 WHERE user.role != 1 AND user.companyId = '1';
 `,
+    getAllCustomersCount: `SELECT *
+FROM orders
+WHERE DATE(date) = CURDATE();
+`,
     getAllCustomers: `WITH RankedOrders AS (
     SELECT
         o.name AS orderName,
@@ -306,7 +310,7 @@ JOIN
 ORDER BY 
     ha.hairDresserName, od.orderDate;
 `,
-getExpensesByRange: `SELECT 
+    getExpensesByRange: `SELECT 
     e.*, 
     expenses_type.name AS expenseTypeName, 
     branch.name AS branchName
@@ -329,7 +333,7 @@ WHERE
   JOIN hairdresser ON hairDressing.hairDresserId = hairdresser.id
   WHERE hairDressing.hairStyleId = ?;
   `,
-  get_hairdressing2: `SELECT 
+    get_hairdressing2: `SELECT 
     hd.*,
     hs.name AS hairStyleName
 FROM 
