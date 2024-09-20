@@ -128,12 +128,12 @@ JOIN
     register_hairdresser: 'INSERT INTO hairdresser (name, branchId, companyId) VALUES (?, ?, ?)',
     get_all_hairstyle_ids: 'SELECT id FROM hairStyle WHERE branchId = ?',
     bulk_register_hairdressing: 'INSERT INTO hairDressing (hairStyleId, hairdresserId) VALUES ?',
-    check_hairStyle_existence: 'SELECT * FROM hairStyle WHERE name = ? AND companyId = ? LIMIT 1',
-    register_hairStyle: 'INSERT INTO hairStyle (name, amount, description, officeAmount, hairDresserAmount, costOfHair, vishanga, remainderAmount, companyId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    check_hairStyle_existence: 'SELECT * FROM hairStyle WHERE name = ? AND branchId = ? AND companyId = ? LIMIT 1',
+    register_hairStyle: 'INSERT INTO hairStyle (name, amount, description, officeAmount, hairDresserAmount, costOfHair, vishanga, remainderAmount, branchId, companyId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     check_hairStyle_existence_byId: 'SELECT * FROM hairDressing WHERE hairStyleId = ? LIMIT 1',
     deleteMsuko: 'DELETE FROM hairStyle WHERE id = ?',
     checkForHairStyle: 'SELECT * FROM hairStyle WHERE name = ? AND id = ? LIMIT 1',
-    edit_Hairstyle: `UPDATE hairStyle SET name = ?, amount = ?, description = ?, officeAmount = ?, hairDresserAmount = ?, costOfHair = ?, vishanga = ?, remainderAmount = ? WHERE id = ?`,
+    edit_Hairstyle: `UPDATE hairStyle SET name = ?, amount = ?, description = ?, officeAmount = ?, hairDresserAmount = ?, costOfHair = ?, vishanga = ?, remainderAmount = ?, branchId = ? WHERE id = ?`,
     getHairStyles: 'SELECT * FROM hairStyle WHERE companyId = ? AND branchId = ?',
     getOrders: `WITH OrderDetails AS (
     SELECT 

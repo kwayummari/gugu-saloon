@@ -24,12 +24,12 @@ const registerHairStyle = async (req, res) => {
             const firstError = errors.array()[0];
             return res.status(300).json({ message: firstError.msg });
         }
-        const { name, amount, description, officeAmount, hairDresserAmount, costOfHair, vishanga, remainderAmount, companyId } = req.body;
+        const { name, amount, description, officeAmount, hairDresserAmount, costOfHair, vishanga, remainderAmount, branchId, companyId } = req.body;
         const connectionPool = await connectionPoolWithRetry();
 
         connectionPool.query(
             queries.check_hairStyle_existence,
-            [name, companyId],
+            [name, branchId, companyId],
             (error, result) => {
                 if (error) {
                     return res.status(500).json({ message: error.message });
@@ -39,7 +39,7 @@ const registerHairStyle = async (req, res) => {
                 }
                 connectionPool.query(
                     queries.register_hairStyle,
-                    [name, amount, description, officeAmount, hairDresserAmount, costOfHair, vishanga, remainderAmount, companyId],
+                    [name, amount, description, officeAmount, hairDresserAmount, costOfHair, vishanga, remainderAmount,branchId, companyId],
                     (error, result) => {
                         if (error) {
                             return res.status(500).json({ message: error.message });

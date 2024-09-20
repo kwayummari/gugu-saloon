@@ -22,7 +22,7 @@ const editMsuko = async (req, res) => {
             const firstError = errors.array()[0];
             return res.status(300).json({ message: firstError.msg });
         }
-        const { name, amount, description, officeAmount, hairDresserAmount, costOfHair, vishanga, remainderAmount, id } = req.body;
+        const { name, amount, description, officeAmount, hairDresserAmount, costOfHair, vishanga, remainderAmount, branchId, id } = req.body;
         const connectionPool = await connectionPoolWithRetry();
 
         connectionPool.query(
@@ -37,7 +37,7 @@ const editMsuko = async (req, res) => {
                 }
                 connectionPool.query(
                     queries.edit_Hairstyle,
-                    [name, amount, description, officeAmount, hairDresserAmount, costOfHair, vishanga, remainderAmount, id],
+                    [name, amount, description, officeAmount, hairDresserAmount, costOfHair, vishanga, remainderAmount, branchId, id],
                     (error, result) => {
                         if (error) {
                             return res.status(500).json({ message: error.message });
