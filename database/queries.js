@@ -152,8 +152,13 @@ JOIN
     JOIN 
         hairStyle hs ON o.hairstyleId = hs.id
     WHERE 
-        o.companyId = ? AND o.branchId = ? AND DATE(o.date) = CURRENT_DATE
-),
+        o.companyId = ? 
+        AND o.branchId = ? 
+        AND DATE(o.date) = CURRENT_DATE
+    GROUP BY 
+        o.receiptNumber, o.hairDresserId, o.name, o.date, hs.HairDresserAmount, 
+        hs.officeAmount, hs.description, hs.costOfHair, hs.vishanga, hs.name
+), 
 HairDresserAggregates AS (
     SELECT 
         hd.id AS hairDresserId,
@@ -167,10 +172,12 @@ HairDresserAggregates AS (
     JOIN 
         hairdresser hd ON o.hairDresserId = hd.id
     WHERE 
-        o.companyId = ? AND o.branchId = ? AND DATE(o.date) = CURRENT_DATE
+        o.companyId = ? 
+        AND o.branchId = ? 
+        AND DATE(o.date) = CURRENT_DATE
     GROUP BY 
         hd.id, hd.name
-),
+), 
 TotalOfficeAmount AS (
     SELECT 
         SUM(hs.officeAmount) AS overallTotalOfficeAmount,
@@ -183,17 +190,21 @@ TotalOfficeAmount AS (
     JOIN 
         hairStyle hs ON o.hairstyleId = hs.id
     WHERE 
-        o.companyId = ? AND o.branchId = ? AND DATE(o.date) = CURRENT_DATE
-),
+        o.companyId = ? 
+        AND o.branchId = ? 
+        AND DATE(o.date) = CURRENT_DATE
+), 
 TotalExpenses AS (
     SELECT 
         SUM(e.amount) AS overallTotalExpenses
     FROM 
         expenses e
     WHERE 
-        e.companyId = ? AND e.branchId = ? AND DATE(e.date) = CURRENT_DATE
+        e.companyId = ? 
+        AND e.branchId = ? 
+        AND DATE(e.date) = CURRENT_DATE
 )
-SELECT 
+SELECT DISTINCT 
     ha.hairDresserName,
     ha.totalHairDresserAmount,
     ha.totalOfficeAmount,
