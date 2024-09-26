@@ -251,7 +251,12 @@ ORDER BY
     JOIN 
         hairStyle hs ON o.hairstyleId = hs.id
     WHERE 
-        o.companyId = ? AND o.branchId = ? AND o.date BETWEEN ? AND ?
+        o.companyId = ? 
+        AND o.branchId = ? 
+        AND o.date BETWEEN ? AND ?
+    GROUP BY 
+        o.receiptNumber, o.hairDresserId, o.name, o.date, hs.hairDresserAmount, 
+        hs.officeAmount, hs.description, hs.costOfHair, hs.vishanga
 ),
 HairDresserAggregates AS (
     SELECT 
@@ -266,7 +271,9 @@ HairDresserAggregates AS (
     JOIN 
         hairdresser hd ON o.hairDresserId = hd.id
     WHERE 
-        o.companyId = ? AND o.branchId = ? AND o.date BETWEEN ? AND ?
+        o.companyId = ? 
+        AND o.branchId = ? 
+        AND o.date BETWEEN ? AND ?
     GROUP BY 
         hd.id, hd.name
 ),
@@ -282,7 +289,9 @@ TotalOfficeAmount AS (
     JOIN 
         hairStyle hs ON o.hairstyleId = hs.id
     WHERE 
-        o.companyId = ? AND o.branchId = ? AND o.date BETWEEN ? AND ?
+        o.companyId = ? 
+        AND o.branchId = ? 
+        AND o.date BETWEEN ? AND ?
 ),
 ExpensesTotal AS (
     SELECT 
@@ -290,9 +299,11 @@ ExpensesTotal AS (
     FROM 
         expenses e
     WHERE 
-        e.companyId = ? AND e.branchId = ? AND e.date BETWEEN ? AND ?
+        e.companyId = ? 
+        AND e.branchId = ? 
+        AND e.date BETWEEN ? AND ?
 )
-SELECT 
+SELECT DISTINCT
     ha.hairDresserName,
     ha.totalHairDresserAmount,
     ha.totalOfficeAmount,
