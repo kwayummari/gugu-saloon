@@ -4,7 +4,8 @@ const queries = require('../../database/queries');
 
 const validateExpenses = [
     body('valueHolder').trim().notEmpty().withMessage('Please select expense type'),
-    body('amount').trim().notEmpty().withMessage('Please add amount')
+    body('amount').trim().notEmpty().withMessage('Please add amount'),
+    body('description').trim().notEmpty().withMessage('Please add description')
 ];
 
 const addExpenses = async (req, res) => {
@@ -14,12 +15,12 @@ const addExpenses = async (req, res) => {
             const firstError = errors.array()[0];
             return res.status(300).json({ message: firstError.msg });
         }
-        const { valueHolder, amount, branchId, companyId } = req.body;
+        const { valueHolder, amount, branchId, companyId, description } = req.body;
         const connectionPool = await connectionPoolWithRetry();
 
         connectionPool.query(
             queries.addExpenses,
-            [ valueHolder, amount, branchId, companyId ],
+            [ valueHolder, amount, description, branchId, companyId ],
             (error, result) => {
                 if (error) {
                     return res.status(500).json({ message: error.message });

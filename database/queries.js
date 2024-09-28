@@ -367,7 +367,7 @@ WHERE
 `,
     add_order: 'INSERT INTO orders (name, phone, hairStyleId, hairDresserId, receiptNumber, companyId, branchId) VALUES (?, ?, ?, ?, ?, ?, ?)',
     getExpenses: 'SELECT * FROM expenses_type WHERE companyId = ?',
-    addExpenses: 'INSERT INTO expenses (expense_type_id, amount, branchId, companyId) VALUES (?, ?, ?, ?)'
+    addExpenses: 'INSERT INTO expenses (expense_type_id, amount, description, branchId, companyId) VALUES (?, ?, ?, ?, ?)'
 };
 
 module.exports = queries;
