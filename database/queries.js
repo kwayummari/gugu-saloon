@@ -367,9 +367,13 @@ WHERE
 `,
     add_order: 'INSERT INTO orders (name, phone, hairStyleId, hairDresserId, receiptNumber, companyId, branchId) VALUES (?, ?, ?, ?, ?, ?, ?)',
     getExpenses: 'SELECT * FROM expenses_type WHERE companyId = ?',
-    getAllExpenses: `SELECT expenses.*, expenses_type.name AS expense_type_name FROM expenses
-    JOIN expenses_type ON expenses.expense_type_id = expenses_type.id;
-    WHERE companyId = ? AND branchId = ?`,
+    getAllExpenses: `SELECT expenses.*, expenses_type.name AS expense_type_name
+FROM expenses
+JOIN expenses_type ON expenses.expense_type_id = expenses_type.id
+WHERE companyId = ? 
+AND branchId = ?
+AND DATE(expenses.date) = CURDATE();
+`,
     addExpenses: 'INSERT INTO expenses (expense_type_id, amount, description, branchId, companyId) VALUES (?, ?, ?, ?, ?)'
 };
 
