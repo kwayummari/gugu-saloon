@@ -146,7 +146,7 @@ JOIN
 JOIN 
     hairStyle hs ON o.hairStyleId = hs.id
 WHERE 
-    companyId = ? AND branchId = ? AND DATE(o.date) = CURDATE()
+    o.companyId = ? AND o.branchId = ? AND DATE(o.date) = CURDATE()
 GROUP BY 
     o.hairStyleId, h.name;
 `,
