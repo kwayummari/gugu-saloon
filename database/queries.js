@@ -136,7 +136,7 @@ JOIN
     edit_Hairstyle: `UPDATE hairStyle SET name = ?, amount = ?, description = ?, officeAmount = ?, hairDresserAmount = ?, costOfHair = ?, vishanga = ?, remainderAmount = ?, branchId = ? WHERE id = ?`,
     getHairStyles: 'SELECT * FROM hairStyle WHERE companyId = ? AND branchId = ?',
     getPayroll: `SELECT 
-    o.hairStyleId, 
+    o.hairDresserId, 
     h.name AS hairDresserName, 
     SUM(hs.hairDresserAmount) AS totalHairDresserAmount
 FROM 
