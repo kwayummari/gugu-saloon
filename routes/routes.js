@@ -44,6 +44,7 @@ const { validateHairdresser, registerHairDresser } = require('../models/hairdres
 const { validateHairStyle, registerHairStyle } = require('../models/misuko/add_misuko');
 const getAllHairStyle = require('../models/misuko/get_misuko_by_id');
 const getAllHairStyles = require('../models/misuko/get_all_misuko');
+const getPayrolls = require('../models/orders/payroll');
 const getAllOrders = require('../models/orders/get_all_order');
 const getAllOrdersByRange = require('../models/orders/get_all_order_by_range');
 const getExpensesByRange = require('../models/orders/get_expenses_by_range');
@@ -103,6 +104,7 @@ router.post('/register_hairdresser', validateHairdresser, registerHairDresser);
 router.post('/register_hairStyle', validateHairStyle, registerHairStyle);
 router.post('/getHairStyle', getAllHairStyle.getMisukoById);
 router.post('/getAllHairStyle', getAllHairStyles.getMisuko);
+router.post('/getPayroll', getPayrolls.payroll);
 router.post('/getOrders', getAllOrders.getOrders);
 router.post('/getOrdersByRange', getAllOrdersByRange.getOrdersByRange);
 router.post('/getExpensesByRange', getExpensesByRange.getExpensesByRange);

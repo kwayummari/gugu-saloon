@@ -135,6 +135,21 @@ JOIN
     checkForHairStyle: 'SELECT * FROM hairStyle WHERE name = ? AND id = ? LIMIT 1',
     edit_Hairstyle: `UPDATE hairStyle SET name = ?, amount = ?, description = ?, officeAmount = ?, hairDresserAmount = ?, costOfHair = ?, vishanga = ?, remainderAmount = ?, branchId = ? WHERE id = ?`,
     getHairStyles: 'SELECT * FROM hairStyle WHERE companyId = ? AND branchId = ?',
+    getPayroll: `SELECT 
+    o.hairStyleId, 
+    h.name AS hairDresserName, 
+    SUM(hs.hairDresserAmount) AS totalHairDresserAmount
+FROM 
+    orders o
+JOIN 
+    hairdresser h ON o.hairDresserId = h.id
+JOIN 
+    hairStyle hs ON o.hairStyleId = hs.id
+WHERE 
+    companyId = ? AND branchId = ? AND DATE(o.date) = CURDATE()
+GROUP BY 
+    o.hairStyleId, h.name;
+`,
     getOrders: `WITH OrderDetails AS (
     SELECT 
         o.hairDresserId,
