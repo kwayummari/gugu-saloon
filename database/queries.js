@@ -146,9 +146,11 @@ JOIN
 JOIN 
     hairStyle hs ON o.hairStyleId = hs.id
 WHERE 
-    o.companyId = ? AND o.branchId = ? AND DATE(o.date) = CURDATE()
+    o.companyId = ? 
+    AND o.branchId = ? 
+    AND DATE(o.date) = CURDATE()
 GROUP BY 
-    o.hairStyleId, h.name;
+    o.hairStyleId;
 `,
     getOrders: `WITH OrderDetails AS (
     SELECT 
