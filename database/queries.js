@@ -150,7 +150,7 @@ WHERE
     AND o.branchId = ? 
     AND DATE(o.date) = CURDATE()
 GROUP BY 
-    o.hairStyleId;
+    o.hairDresserId;
 `,
     getOrders: `WITH OrderDetails AS (
     SELECT 
