@@ -154,26 +154,18 @@ JOIN
     GROUP BY 
         o.hairDresserId, h.name;
     `,
-    performReconciliation: `
-    WITH CTE_Duplicates AS (
-    SELECT 
-        id,
-        ROW_NUMBER() OVER (
-            PARTITION BY hairStyleId, hairDresserId, name, phone, date, branchId, companyId 
-            ORDER BY id
-        ) AS row_num
-    FROM 
-        orders
-    WHERE 
-        date = CURDATE() AND 
-        branchId = ? AND 
-        companyId = ?
-)
-DELETE FROM orders
-WHERE id IN (
-    SELECT id FROM CTE_Duplicates WHERE row_num > 1
-);
-    `,
+    performReconciliation: `DELETE FROM orders
+WHERE id NOT IN (
+    SELECT id FROM (
+        SELECT MIN(id) AS id
+        FROM orders
+        WHERE date = CURDATE() 
+          AND branchId = ? 
+          AND companyId = ?
+        GROUP BY hairStyleId, hairDresserId, name, phone, date, branchId, companyId
+    ) AS Temp
+) AND date = CURDATE();
+`,
     getOrders: `WITH OrderDetails AS (
     SELECT 
         o.hairDresserId,
