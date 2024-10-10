@@ -154,21 +154,25 @@ JOIN
     GROUP BY 
         o.hairDresserId, h.name;
     `,
-    getPayrollWeb: `SELECT 
-    o.hairDresserId,
-    o.date,
-    h.name AS hairDresserName, 
-    SUM(hs.hairDresserAmount) AS totalHairDresserAmount
+    performReconciliation: `
+    WITH CTE_Duplicates AS (
+    SELECT 
+        id,
+        ROW_NUMBER() OVER (
+            PARTITION BY hairStyleId, hairDresserId, name, phone, date, branchId, companyId 
+            ORDER BY id
+        ) AS row_num
     FROM 
-    orders o
-    JOIN 
-    hairdresser h ON o.hairDresserId = h.id
-    JOIN 
-    hairStyle hs ON o.hairStyleId = hs.id
+        orders
     WHERE 
-    o.companyId = ? AND o.branchId = ?
-    GROUP BY 
-    o.hairDresserId, h.name;
+        date = CURDATE() AND 
+        branchId = ? AND 
+        companyId = ?
+)
+DELETE FROM orders
+WHERE id IN (
+    SELECT id FROM CTE_Duplicates WHERE row_num > 1
+);
     `,
     getOrders: `WITH OrderDetails AS (
     SELECT 

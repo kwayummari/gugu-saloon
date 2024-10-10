@@ -1,21 +1,17 @@
 const connectionPoolWithRetry = require('../../database/db_connection');
 const queries = require('../../database/queries');
 
-const payrollWeb = async (req, res) => {
+const reconciliation = async (req, res) => {
   try {
     const {companyId, branchId} = req.body;
     const connectionPool = await connectionPoolWithRetry();
-    connectionPool.query(queries.getPayrollWeb, [companyId, branchId], (error, results) => {
+    connectionPool.query(queries.performReconciliation, [companyId, branchId], (error) => {
       if (error) {
-        console.error('Error fetching payroll:', error);
+        console.error('Error performing reconciliation:', error);
         return res.status(500).json({ message: 'Internal Server Error' });
       }
 
-      if (results.length === 0) {
-        return res.status(404).json({ message: 'No Payroll found' });
-      }
-
-      res.status(200).json({ message: 'Payroll fetched successfully', payroll: results });
+      res.status(200).json({ message: 'Reconciliation done successfully' });
     });
   } catch (err) {
     console.error('Error initializing connection:', err);
@@ -24,5 +20,5 @@ const payrollWeb = async (req, res) => {
 };
 
 module.exports = {
-  payrollWeb,
+  reconciliation,
 };
