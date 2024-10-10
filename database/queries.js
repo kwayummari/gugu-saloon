@@ -143,17 +143,33 @@ JOIN
     o.date,
     h.name AS hairDresserName, 
     SUM(hs.hairDresserAmount) AS totalHairDresserAmount
-FROM 
+    FROM 
+        orders o
+    JOIN 
+        hairdresser h ON o.hairDresserId = h.id
+    JOIN 
+        hairStyle hs ON o.hairStyleId = hs.id
+    WHERE 
+        o.companyId = ? AND o.branchId = ? AND DATE(o.date) = CURDATE()
+    GROUP BY 
+        o.hairDresserId, h.name;
+    `,
+    getPayrollWeb: `SELECT 
+    o.hairDresserId,
+    o.date,
+    h.name AS hairDresserName, 
+    SUM(hs.hairDresserAmount) AS totalHairDresserAmount
+    FROM 
     orders o
-JOIN 
+    JOIN 
     hairdresser h ON o.hairDresserId = h.id
-JOIN 
+    JOIN 
     hairStyle hs ON o.hairStyleId = hs.id
-WHERE 
-    o.companyId = ? AND o.branchId = ? AND DATE(o.date) = CURDATE()
-GROUP BY 
+    WHERE 
+    o.companyId = ? AND o.branchId = ?
+    GROUP BY 
     o.hairDresserId, h.name;
-`,
+    `,
     getOrders: `WITH OrderDetails AS (
     SELECT 
         o.hairDresserId,
