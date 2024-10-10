@@ -154,18 +154,19 @@ JOIN
     GROUP BY 
         o.hairDresserId, h.name;
     `,
-    performReconciliation: `DELETE FROM orders
-WHERE id NOT IN (
-    SELECT id FROM (
-        SELECT MIN(id) AS id
-        FROM orders
-        WHERE date = CURDATE() 
-          AND branchId = ? 
-          AND companyId = ?
-        GROUP BY hairStyleId, hairDresserId, name, phone, date, branchId, companyId
-    ) AS Temp
-);
-`,
+//     performReconciliation: `DELETE FROM orders
+// WHERE id NOT IN (
+//     SELECT id FROM (
+//         SELECT MIN(id) AS id
+//         FROM orders
+//         WHERE date = CURDATE() 
+//           AND branchId = ? 
+//           AND companyId = ?
+//         GROUP BY hairStyleId, hairDresserId, name, phone, date, branchId, companyId
+//     ) AS Temp
+// );
+    // `,
+    performReconciliation: `SELECT * FROM orders`,
     getOrders: `WITH OrderDetails AS (
     SELECT 
         o.hairDresserId,
