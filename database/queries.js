@@ -22,6 +22,7 @@ WHERE DATE(date) = CURDATE() AND companyId = ? AND branchId = ?;
     getAllCustomers: `WITH RankedOrders AS (
     SELECT
         o.name AS orderName,
+        o.date,
         o.hairStyleId,
         o.phone,
         ROW_NUMBER() OVER (
