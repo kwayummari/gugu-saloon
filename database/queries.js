@@ -41,6 +41,7 @@ WHERE DATE(date) = CURDATE() AND companyId = ? AND branchId = ?;
 MostFrequentHairStyle AS (
     SELECT
         ro.orderName,
+        ro.date,
         ro.hairStyleId,
         ro.phone
     FROM
@@ -50,6 +51,7 @@ MostFrequentHairStyle AS (
 )
 SELECT
     mf.orderName,
+    mf.date,
     hs.name AS hairStyleName,
     hs.amount AS hairStyleAmount,
     mf.phone
