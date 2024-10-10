@@ -164,7 +164,7 @@ WHERE id NOT IN (
           AND companyId = ?
         GROUP BY hairStyleId, hairDresserId, name, phone, date, branchId, companyId
     ) AS Temp
-) AND date = CURDATE();
+);
 `,
     getOrders: `WITH OrderDetails AS (
     SELECT 
