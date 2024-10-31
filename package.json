@@ -2,9 +2,13 @@
   "name": "kstructure",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "testing.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "pm2 start testing.js", 
+    "dev": "node testing.js",         
+    "test": "mocha",             
+    "stop": "pm2 stop testing.js",     
+    "restart": "pm2 restart testing.js"   
   },
   "keywords": [],
   "author": "",
