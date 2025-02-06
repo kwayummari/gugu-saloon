@@ -397,9 +397,10 @@ JOIN
 WHERE 
     hd.hairdresserId = ?;
 `,
-    add_order: 'INSERT INTO orders (name, phone, hairStyleId, hairDresserId, receiptNumber, companyId, branchId) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    getExpenses: 'SELECT * FROM expenses_type WHERE companyId = ?',
-    getAllExpenses: `SELECT expenses.*, expenses_type.name AS expense_type_name
+add_order: 'INSERT INTO orders (name, phone, hairStyleId, hairDresserId, receiptNumber, status, companyId, branchId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+getStatus: 'SELECT status FROM hairdresser WHERE id = ?',
+getExpenses: 'SELECT * FROM expenses_type WHERE companyId = ?',
+getAllExpenses: `SELECT expenses.*, expenses_type.name AS expense_type_name
 FROM expenses
 JOIN expenses_type ON expenses.expense_type_id = expenses_type.id
 WHERE companyId = ? 
