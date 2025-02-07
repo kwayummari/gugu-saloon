@@ -3,7 +3,7 @@ const queries = require('../../database/queries');
 
 const getOrdersByRange = async (req, res) => {
   try {
-    const { startDate, endDate, companyId, branchId } = req.body;
+    const { startDate, endDate, companyId, branchId, orderStatus } = req.body;
     const connectionPool = await connectionPoolWithRetry();
     connectionPool.query(queries.getOrdersByRange,
       [companyId, branchId, orderStatus, startDate, endDate, companyId, branchId, orderStatus, startDate, endDate, companyId, branchId, orderStatus, startDate, endDate, companyId, branchId, orderStatus, startDate, endDate],
