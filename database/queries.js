@@ -283,7 +283,7 @@ ORDER BY
     WHERE 
         o.companyId = ? 
         AND o.branchId = ?
-        AND o.status IN (0, 1) -- Ensuring status is 0 or 1
+        AND o.status = ?
         AND o.date BETWEEN ? AND ?
     GROUP BY 
         o.receiptNumber, o.hairDresserId, o.name, o.date, 
@@ -302,7 +302,7 @@ HairDresserAggregates AS (
     WHERE 
         o.companyId = ? 
         AND o.branchId = ?
-        AND o.status IN (0, 1)
+        AND o.status = ? 
         AND o.date BETWEEN ? AND ?
     GROUP BY hd.id, hd.name
 ),
@@ -318,7 +318,7 @@ TotalOfficeAmount AS (
     WHERE 
         o.companyId = ? 
         AND o.branchId = ?
-        AND o.status IN (0, 1) 
+        AND o.status = ? 
         AND o.date BETWEEN ? AND ?
 ),
 ExpensesTotal AS (
