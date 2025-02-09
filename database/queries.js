@@ -272,23 +272,24 @@ ORDER BY
         o.hairDresserId,
         o.name AS orderName,
         o.date AS orderDate,
-        o.receiptNumber,
+        o.receiptNumber AS receiptNumber,
         hs.hairDresserAmount,
         hs.officeAmount,
         hs.description,
         hs.costOfHair,
         hs.vishanga
-    FROM orders o
-    JOIN hairStyle hs ON o.hairstyleId = hs.id
+    FROM 
+        orders o
+    JOIN 
+        hairStyle hs ON o.hairstyleId = hs.id
     WHERE 
         o.companyId = ? 
         AND o.branchId = ?
         AND o.status = ?
         AND o.date BETWEEN ? AND ?
     GROUP BY 
-        o.receiptNumber, o.hairDresserId, o.name, o.date, 
-        hs.hairDresserAmount, hs.officeAmount, hs.description, 
-        hs.costOfHair, hs.vishanga
+        o.receiptNumber, o.hairDresserId, o.name, o.date, hs.hairDresserAmount, 
+        hs.officeAmount, hs.description, hs.costOfHair, hs.vishanga
 ),
 HairDresserAggregates AS (
     SELECT 
@@ -296,15 +297,19 @@ HairDresserAggregates AS (
         hd.name AS hairDresserName,
         SUM(hs.hairDresserAmount) AS totalHairDresserAmount,
         SUM(hs.officeAmount) AS totalOfficeAmount
-    FROM orders o
-    JOIN hairStyle hs ON o.hairstyleId = hs.id
-    JOIN hairdresser hd ON o.hairDresserId = hd.id
+    FROM 
+        orders o
+    JOIN 
+        hairStyle hs ON o.hairstyleId = hs.id
+    JOIN 
+        hairdresser hd ON o.hairDresserId = hd.id
     WHERE 
         o.companyId = ? 
         AND o.branchId = ?
         AND o.status = ? 
         AND o.date BETWEEN ? AND ?
-    GROUP BY hd.id, hd.name
+    GROUP BY 
+        hd.id, hd.name
 ),
 TotalOfficeAmount AS (
     SELECT 
@@ -313,8 +318,10 @@ TotalOfficeAmount AS (
         SUM(hs.costOfHair) AS overallTotalCostOfHair,
         SUM(hs.vishanga) AS overallTotalVishanga,
         SUM(hs.amount) AS overallTotalAmountPaid
-    FROM orders o
-    JOIN hairStyle hs ON o.hairstyleId = hs.id
+    FROM 
+        orders o
+    JOIN 
+        hairStyle hs ON o.hairstyleId = hs.id
     WHERE 
         o.companyId = ? 
         AND o.branchId = ?
@@ -324,7 +331,8 @@ TotalOfficeAmount AS (
 ExpensesTotal AS (
     SELECT 
         SUM(e.amount) AS actualExpenses
-    FROM expenses e
+    FROM 
+        expenses e
     WHERE 
         e.companyId = ? 
         AND e.branchId = ? 
@@ -348,12 +356,16 @@ SELECT DISTINCT
     od.officeAmount,
     od.receiptNumber,
     et.actualExpenses
-FROM HairDresserAggregates ha
-JOIN OrderDetails od ON ha.hairDresserId = od.hairDresserId
-JOIN TotalOfficeAmount toa
-JOIN ExpensesTotal et
-ORDER BY ha.hairDresserName, od.orderDate;
-
+FROM 
+    HairDresserAggregates ha
+JOIN 
+    OrderDetails od ON ha.hairDresserId = od.hairDresserId
+JOIN 
+    TotalOfficeAmount toa
+JOIN 
+    ExpensesTotal et
+ORDER BY 
+    ha.hairDresserName, od.orderDate;
 `,
 
 
