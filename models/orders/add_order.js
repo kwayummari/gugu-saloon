@@ -31,6 +31,45 @@ const registerOrder = async (req, res) => {
 
         const connectionPool = await connectionPoolWithRetry();
 
+
+        // Get current date and time
+        let now = new Date();
+        let hours = now.getHours();
+        
+        // If time is between 00:00 and 07:59, subtract one day
+        if (hours >= 0 && hours < 8) {
+            now.setDate(now.getDate() - 1);
+        let formattedDate = now.toISOString().split('T')[0];
+        connectionPool.query(queries.getStatus, [managerId], (error, result) => {
+            if (error) {
+                console.log(error);
+                return res.status(500).json({ message: error.message });
+            }
+
+            if (result.length === 0) {
+                return res.status(404).json({ message: 'Manager not found' });
+            }
+
+            const managerStatus = result[0].status;
+
+            // Insert order with retrieved manager status
+            connectionPool.query(
+                queries.add_order_with_date,
+                [name, phone, hairStyleId, hairDresserId, randomNumber, managerStatus,formattedDate, companyId, branchId],
+                (error, result) => {
+                    if (error) {
+                        console.log(error);
+                        return res.status(500).json({ message: error.message });
+                    }
+                    return res.status(200).json({ message: 'Order created successfully', order: result });
+                }
+            );
+        });
+
+        }
+        
+        // Format the date to YYYY-MM-DD
+
         // First, get the manager status
         connectionPool.query(queries.getStatus, [managerId], (error, result) => {
             if (error) {
