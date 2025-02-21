@@ -56,7 +56,7 @@ const { validateEditHairDresser, editHairDresser } = require('../models/hairdres
 const { validateHairdressers, postHairDresser } = require('../models/hairdresser/post_hairdresser');
 const getHairDressings = require('../models/hairdresser/get_hairdressing');
 const getHairDressings2 = require('../models/hairdresser/get_hairdressing2');
-const { validateOrder, registerOrder } = require('../models/orders/add_order');
+const { validateOrderFields, registerOrder } = require('../models/orders/add_order');
 const getExpenses = require('../models/expenses/get_expenses');
 const { validateExpenses, addExpenses } = require('../models/expenses/add_expenses');
 
