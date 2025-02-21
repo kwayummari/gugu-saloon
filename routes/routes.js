@@ -117,7 +117,7 @@ router.post('/edit_hairDresser', validateEditHairDresser, editHairDresser);
 router.post('/post_hairDresser', validateHairdressers, postHairDresser);
 router.post('/getHairDressing', getHairDressings.getHairDressing);
 router.post('/getHairDressing2', getHairDressings2.getHairDressing2);
-router.post('/addOrder',  registerOrder);
+router.post('/addOrder',validateOrderFields,  registerOrder);
 router.post('/getExpenses', getExpenses.getExpenses);
 router.post('/add_expenses', validateExpenses, addExpenses);
 

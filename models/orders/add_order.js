@@ -4,6 +4,18 @@ const { body, validationResult } = require('express-validator');
 const queries = require('../../database/queries');
 const xss = require('xss');
 
+// Validator functions for each field
+const validateOrderFields = [
+    body('name').notEmpty().withMessage('Name is required').trim().escape(),
+    body('phone').notEmpty().withMessage('Phone number is required').isMobilePhone().withMessage('Invalid phone number').trim().escape(),
+    body('hairStyleId').isInt().withMessage('Hair style ID must be an integer').toInt(),
+    body('hairDresserId').isInt().withMessage('Hair dresser ID must be an integer').toInt(),
+    body('randomNumber').isNumeric().withMessage('Random number must be numeric').trim(),
+    body('companyId').isInt().withMessage('Company ID must be an integer').toInt(),
+    body('branchId').isInt().withMessage('Branch ID must be an integer').toInt(),
+    body('managerId').isInt().withMessage('Manager ID must be an integer').toInt()
+];
+
 const registerOrder = async (req, res) => {
     try {
         // Validate request body fields
@@ -68,5 +80,6 @@ const registerOrder = async (req, res) => {
 };
 
 module.exports = {
-    registerOrder
+    registerOrder,
+    validateOrderFields
 };
