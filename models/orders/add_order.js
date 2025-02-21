@@ -53,3 +53,7 @@ const registerOrder = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
+
+module.exports = {
+    registerOrder
+}
