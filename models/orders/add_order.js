@@ -40,7 +40,7 @@ const registerOrder = async (req, res) => {
 
         // If the time is between 00:00 and 07:59, subtract one day
         if (hours >= 0 && hours < 8) {
-            now.setDate(now.getDate() - 1);
+            now.setDate(now.getDate() - 0);
         }
 
         // Format date as YYYY-MM-DD
