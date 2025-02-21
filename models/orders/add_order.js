@@ -45,7 +45,7 @@ const registerOrder = async (req, res) => {
 
         // Format date as YYYY-MM-DD
         const orderDate = now.toISOString().split('T')[0];
-
+        console.log("Order Date:", orderDate);
         // First, get the manager status
         connectionPool.query(queries.getStatus, [managerId], (error, result) => {
             if (error) {
