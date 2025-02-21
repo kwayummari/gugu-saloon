@@ -1,11 +1,24 @@
+const connectionPoolWithRetry = require('../../database/db_connection');
+const bcrypt = require('bcrypt');
+const { body, validationResult } = require('express-validator');
+const queries = require('../../database/queries');
+const xss = require('xss');
+
 const registerOrder = async (req, res) => {
     try {
+        // Validate request body fields
         const errors = validationResult(req);
+
+        // If there are validation errors, return a 400 response with the first error message
         if (!errors.isEmpty()) {
             return res.status(400).json({ message: errors.array()[0].msg });
         }
 
         const { name, phone, hairStyleId, hairDresserId, randomNumber, companyId, branchId, managerId } = req.body;
+
+        // Sanitize the input to prevent XSS attacks
+        const sanitizedName = xss(name);
+        const sanitizedPhone = xss(phone);
 
         const connectionPool = await connectionPoolWithRetry();
 
@@ -37,7 +50,7 @@ const registerOrder = async (req, res) => {
             // Insert order using add_order_with_date query
             connectionPool.query(
                 queries.add_order_with_date, // Using the new query to include the order date
-                [name, phone, hairStyleId, hairDresserId, randomNumber, managerStatus, companyId, branchId, orderDate],
+                [sanitizedName, sanitizedPhone, hairStyleId, hairDresserId, randomNumber, managerStatus, companyId, branchId, orderDate],
                 (error, result) => {
                     if (error) {
                         console.log(error);
@@ -55,5 +68,5 @@ const registerOrder = async (req, res) => {
 };
 
 module.exports = {
-     registerOrder,
-}
+    registerOrder
+};
