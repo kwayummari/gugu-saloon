@@ -507,7 +507,7 @@ WHERE
     hd.hairdresserId = ?;
 `,
 add_order: 'INSERT INTO orders (name, phone, hairStyleId, hairDresserId, receiptNumber, status, companyId, branchId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-add_order_with_date: `INSERT INTO orders (name, phone, hairStyleId, hairDresserId, receiptNumber, status, date, companyId, branchId) 
+add_order_with_date: `INSERT INTO orders (name, phone, hairStyleId, hairDresserId, receiptNumber, status,  companyId, branchId,date) 
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 
 getStatus: 'SELECT status FROM hairdresser WHERE id = ?',
