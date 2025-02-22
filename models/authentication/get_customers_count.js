@@ -37,6 +37,7 @@ const getCustomersCount = async (req, res) => {
 
         // Respond with the results
         res.status(200).json({ message: 'Customers fetched successfully', customers: results });
+        console.log(results);
       }
     );
   } catch (err) {
