@@ -21,7 +21,6 @@ FROM orders
 WHERE DATE(date) = CURDATE()
   AND companyId = ?
   AND branchId = ?
-  AND status = ?;
 `,
   getAllCustomers: `WITH RankedOrders AS (
     SELECT
