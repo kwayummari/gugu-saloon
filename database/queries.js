@@ -301,7 +301,7 @@ JOIN
   //     ha.hairDresserName, od.orderDate;
   // `,
 
-  getOrdes: `WITH OrderDetails AS (
+  getOrders: `WITH OrderDetails AS (
     SELECT 
         o.hairDresserId,
         o.name AS orderName,
