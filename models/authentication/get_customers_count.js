@@ -11,10 +11,10 @@ const getCustomersCount = async (req, res) => {
     }
 
     // Extract parameters from request body
-    const { companyId, branchId, orderStatus } = req.body;
+    const { companyId, branchId } = req.body;
 
     // Check if the necessary parameters are provided
-    if (!companyId || !branchId || !orderStatus) {
+    if (!companyId || !branchId) {
       return res.status(400).json({ message: 'Missing required parameters.' });
     }
 
@@ -24,7 +24,7 @@ const getCustomersCount = async (req, res) => {
     // Execute the query
     connectionPool.query(
       queries.getAllCustomersCount, 
-      [companyId, branchId, orderStatus],
+      [companyId, branchId],
       (error, results) => {
         if (error) {
           console.log('Error executing query:', error);
