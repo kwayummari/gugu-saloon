@@ -15,12 +15,13 @@ INNER JOIN branch ON user.branch = branch.id
 INNER JOIN roles ON user.role = roles.id
 WHERE user.role != 1 AND user.companyId = '1';
 `,
-  getAllCustomersCount: `SELECT *
-FROM orders
-WHERE DATE(date) = CURDATE() 
-  AND companyId = ? 
-  AND branchId = ? 
-  AND status = ?;
+  getAllCustomersCount: ` 
+  SELECT COUNT(*) AS customerCount
+  FROM orders
+  WHERE DATE(date) = CURRENT(date)
+    AND companyId = 1 
+    AND branchId = 2 
+    AND status = 0;
 `,
   getAllCustomers: `WITH RankedOrders AS (
     SELECT
