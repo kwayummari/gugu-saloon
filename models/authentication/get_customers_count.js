@@ -26,13 +26,13 @@ const getCustomersCount = async (req, res) => {
           return res.status(404).json({ message: 'No customers found' });
         }
 
-        // ✅ Extract the correct column from the result
-        const totalCustomers = results[0].customerCount || 0;
+        // ✅ Ensure the response is an array containing the total customer count
+        const totalCustomers = results.map(result => result.customerCount || 0); // Returning results as an array
         console.log(`Total customers fetched: ${totalCustomers}`);
 
         res.status(200).json({
           message: 'Customers count fetched successfully',
-          totalCustomers: results
+          totalCustomers: totalCustomers // Returning the count as an array
         });
       }
     );
