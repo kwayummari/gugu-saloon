@@ -6,11 +6,9 @@ const getCustomersCount = async (req, res) => {
     const { companyId, branchId } = req.body;
     console.log(`Received params - companyId: ${companyId}, branchId: ${branchId}`);
 
-    // Get a connection from the pool
     const connectionPool = await connectionPoolWithRetry();
     console.log('Connected to MySQL database.');
 
-    // Execute the query
     connectionPool.query(
       queries.getAllCustomersCount,
       [companyId, branchId],
@@ -28,8 +26,8 @@ const getCustomersCount = async (req, res) => {
           return res.status(404).json({ message: 'No customers found' });
         }
 
-        // Extract total customer count from results
-        const totalCustomers = results[0].totalCustomers || 0;
+        // ✅ Extract the correct column from the result
+        const totalCustomers = results[0].customerCount || 0;
         console.log(`Total customers fetched: ${totalCustomers}`);
 
         res.status(200).json({
