@@ -32,7 +32,7 @@ const getCustomersCount = async (req, res) => {
 
         res.status(200).json({
           message: 'Customers count fetched successfully',
-          totalCustomers: totalCustomers
+          totalCustomers: results
         });
       }
     );
