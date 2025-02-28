@@ -10,7 +10,7 @@ const getCustomersCount = async (req, res) => {
       return res.status(400).json({ message: errors.array()[0].msg });
     }
 
-    // Extract parameters from request (supports both GET and POST)
+    // Extract parameters from request
     const { companyId, branchId } = req.query.companyId ? req.query : req.body;
 
     // Log received parameters
@@ -23,12 +23,22 @@ const getCustomersCount = async (req, res) => {
 
     // Create a connection pool
     const pool = await connectionPoolWithRetry();
+    if (!pool) {
+      console.error("Failed to initialize database connection pool.");
+      return res.status(500).json({ message: "Database connection error" });
+    }
 
     let connection;
     try {
       // Get a connection from the pool
       connection = await pool.getConnection();
       console.log("Connected to MySQL database.");
+
+      // Ensure connection object is valid before querying
+      if (!connection.query) {
+        console.error("Database connection issue: connection.query is undefined.");
+        return res.status(500).json({ message: "Database connection error" });
+      }
 
       // Execute the query using promise-based syntax
       const [results] = await connection.query(queries.getAllCustomersCount, [companyId, branchId]);
@@ -44,12 +54,18 @@ const getCustomersCount = async (req, res) => {
       // Respond with the results
       res.status(200).json({ message: 'Customers fetched successfully', customers: results });
 
+    } catch (queryError) {
+      console.error("Query execution error:", queryError);
+      return res.status(500).json({ message: "Internal Server Error" });
     } finally {
-      if (connection) connection.release(); // Release connection back to the pool
+      if (connection) {
+        connection.release(); // Release connection back to the pool
+        console.log("Connection released.");
+      }
     }
 
   } catch (err) {
-    console.error('Error:', err);
+    console.error('Unexpected Error:', err);
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
