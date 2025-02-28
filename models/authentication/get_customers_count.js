@@ -10,9 +10,13 @@ const getCustomersCount = async (req, res) => {
       return res.status(400).json({ message: errors.array()[0].msg });
     }
 
-    // Extract parameters from request query
-    const { companyId, branchId } = req.query; // Use req.query for GET requests
+    // Extract parameters from request (supports both GET and POST)
+    const { companyId, branchId } = req.query.companyId ? req.query : req.body;
 
+    // Log received parameters
+    console.log(`Received params - companyId: ${companyId}, branchId: ${branchId}`);
+
+    // Check if required parameters are provided
     if (!companyId || !branchId) {
       return res.status(400).json({ message: 'Missing required parameters.' });
     }
