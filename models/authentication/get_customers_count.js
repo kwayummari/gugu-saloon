@@ -22,25 +22,30 @@ const getCustomersCount = async (req, res) => {
     }
 
     // Create a connection pool
-    const connectionPool = await connectionPoolWithRetry();
+    const pool = await connectionPoolWithRetry();
 
+    let connection;
     try {
-      // Execute the query using async/await
-      const [results] = await connectionPool.query(queries.getAllCustomersCount, [companyId, branchId]);
+      // Get a connection from the pool
+      connection = await pool.getConnection();
+      console.log("Connected to MySQL database.");
+
+      // Execute the query using promise-based syntax
+      const [results] = await connection.query(queries.getAllCustomersCount, [companyId, branchId]);
 
       if (!results || results.length === 0) {
         console.log('Total customers fetched: 0');
         return res.status(404).json({ message: 'Customers not found' });
       }
 
-      // Print total customers fetched to console
+      // Log total customers fetched
       console.log(`Total customers fetched: ${results.length}`);
 
       // Respond with the results
       res.status(200).json({ message: 'Customers fetched successfully', customers: results });
 
     } finally {
-      connectionPool.release(); // Ensure the connection is released
+      if (connection) connection.release(); // Release connection back to the pool
     }
 
   } catch (err) {
