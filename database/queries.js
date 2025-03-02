@@ -21,7 +21,9 @@ FROM orders
 WHERE DATE(date) = CURDATE()
   AND companyId = ?
   AND branchId = ?
+  AND \`status\` = ?
 `,
+
   getAllCustomers: `WITH RankedOrders AS (
     SELECT
         o.name AS orderName,
@@ -200,209 +202,110 @@ JOIN
   // );
   // `,
   performReconciliation: `SELECT * FROM orders`,
-      getOrders: `WITH OrderDetails AS (
-      SELECT
-          o.hairDresserId,
-          o.name AS orderName,
-          o.date AS orderDate,
-          o.receiptNumber AS receiptNumber,
-          hs.HairDresserAmount,
-          hs.officeAmount,
-          hs.description,
-          hs.costOfHair,
-          hs.vishanga,
-          hs.name AS hairstyleName
-      FROM
-          orders o
-      JOIN
-          hairStyle hs ON o.hairstyleId = hs.id
-      WHERE
-          o.companyId = ?
-          AND o.branchId = ?
-          AND DATE(o.date) = CURRENT_DATE
-      GROUP BY
-          o.receiptNumber, o.hairDresserId, o.name, o.date, hs.HairDresserAmount,
-          hs.officeAmount, hs.description, hs.costOfHair, hs.vishanga, hs.name
-  ),
-  HairDresserAggregates AS (
-      SELECT
-          hd.id AS hairDresserId,
-          hd.name AS hairDresserName,
-          SUM(hs.HairDresserAmount) AS totalHairDresserAmount,
-          SUM(hs.officeAmount) AS totalOfficeAmount
-      FROM
-          orders o
-      JOIN
-          hairStyle hs ON o.hairstyleId = hs.id
-      JOIN
-          hairdresser hd ON o.hairDresserId = hd.id
-      WHERE
-          o.companyId = ?
-          AND o.branchId = ?
-          AND DATE(o.date) = CURRENT_DATE
-      GROUP BY
-          hd.id, hd.name
-  ),
-  TotalOfficeAmount AS (
-      SELECT
-          SUM(hs.officeAmount) AS overallTotalOfficeAmount,
-          SUM(hs.hairDresserAmount) AS overallTotalHairDresserAmount,
-          SUM(hs.costOfHair) AS overallTotalCostOfHair,
-          SUM(hs.vishanga) AS overallTotalVishanga,
-          SUM(hs.amount) AS overallTotalAmountPaid
-      FROM
-          orders o
-      JOIN
-          hairStyle hs ON o.hairstyleId = hs.id
-      WHERE
-          o.companyId = ?
-          AND o.branchId = ?
-          AND DATE(o.date) = CURRENT_DATE
-  ),
-  TotalExpenses AS (
-      SELECT
-          SUM(e.amount) AS overallTotalExpenses
-      FROM
-          expenses e
-      WHERE
-          e.companyId = ?
-          AND e.branchId = ?
-          AND DATE(e.date) = CURRENT_DATE
-  )
-  SELECT DISTINCT
-      ha.hairDresserName,
-      ha.totalHairDresserAmount,
-      ha.totalOfficeAmount,
-      toa.overallTotalOfficeAmount,
-      toa.overallTotalHairDresserAmount,
-      toa.overallTotalCostOfHair,
-      toa.overallTotalVishanga,
-      toa.overallTotalAmountPaid,
-      te.overallTotalExpenses,
-      (toa.overallTotalOfficeAmount - te.overallTotalExpenses) AS actualTotalProfit,
-      od.orderName,
-      od.orderDate,
-      od.hairstyleName,
-      od.description,
-      od.costOfHair,
-      od.vishanga,
-      od.HairDresserAmount,
-      od.officeAmount,
-      od.receiptNumber
-  FROM
-      HairDresserAggregates ha
-  JOIN
-      OrderDetails od ON ha.hairDresserId = od.hairDresserId
-  JOIN
-      TotalOfficeAmount toa
-  JOIN
-      TotalExpenses te
-  ORDER BY
-      ha.hairDresserName, od.orderDate;
-  `,
-
-//   getOrders: `WITH OrderDetails AS (
-//     SELECT 
-//         o.hairDresserId,
-//         o.name AS orderName,
-//         o.date AS orderDate,
-//         o.receiptNumber AS receiptNumber,
-//         o.status AS orderStatus,
-//         hs.HairDresserAmount,
-//         hs.officeAmount,
-//         hs.description,
-//         hs.costOfHair,
-//         hs.vishanga,
-//         hs.name AS hairstyleName
-//     FROM 
-//         orders o
-//     JOIN 
-//         hairStyle hs ON o.hairstyleId = hs.id
-//     WHERE 
-//         o.companyId = ? 
-//         AND o.branchId = ? 
-//         AND DATE(o.date) = CURRENT_DATE
-//         AND o.status = ?  -- Filter by order status
-// ), 
-// HairDresserAggregates AS (
-//     SELECT 
-//         hd.id AS hairDresserId,
-//         hd.name AS hairDresserName,
-//         COALESCE(SUM(hs.HairDresserAmount), 0) AS totalHairDresserAmount,
-//         COALESCE(SUM(hs.officeAmount), 0) AS totalOfficeAmount
-//     FROM 
-//         orders o
-//     JOIN 
-//         hairStyle hs ON o.hairstyleId = hs.id
-//     JOIN 
-//         hairdresser hd ON o.hairDresserId = hd.id
-//     WHERE 
-//         o.companyId = ? 
-//         AND o.branchId = ? 
-//         AND DATE(o.date) = CURRENT_DATE
-//         AND o.status = ?  -- Filter by order status
-//     GROUP BY 
-//         hd.id, hd.name
-// ), 
-// TotalOfficeAmount AS (
-//     SELECT 
-//         COALESCE(SUM(hs.officeAmount), 0) AS overallTotalOfficeAmount,
-//         COALESCE(SUM(hs.hairDresserAmount), 0) AS overallTotalHairDresserAmount,
-//         COALESCE(SUM(hs.costOfHair), 0) AS overallTotalCostOfHair,
-//         COALESCE(SUM(hs.vishanga), 0) AS overallTotalVishanga,
-//         COALESCE(SUM(hs.costOfHair + hs.HairDresserAmount + hs.officeAmount), 0) AS overallTotalAmountPaid
-//     FROM 
-//         orders o
-//     JOIN 
-//         hairStyle hs ON o.hairstyleId = hs.id
-//     WHERE 
-//         o.companyId = ? 
-//         AND o.branchId = ? 
-//         AND DATE(o.date) = CURRENT_DATE
-//         AND o.status = ?  -- Filter by order status
-// ), 
-// TotalExpenses AS (
-//     SELECT 
-//         COALESCE(SUM(e.amount), 0) AS overallTotalExpenses
-//     FROM 
-//         expenses e
-//     WHERE 
-//         e.companyId = ? 
-//         AND e.branchId = ? 
-//         AND DATE(e.date) = CURRENT_DATE
-// )
-// SELECT 
-//     ha.hairDresserName,
-//     ha.totalHairDresserAmount,
-//     ha.totalOfficeAmount,
-//     toa.overallTotalOfficeAmount,
-//     toa.overallTotalHairDresserAmount,
-//     toa.overallTotalCostOfHair,
-//     toa.overallTotalVishanga,
-//     toa.overallTotalAmountPaid,
-//     te.overallTotalExpenses,
-//     (toa.overallTotalOfficeAmount - te.overallTotalExpenses) AS actualTotalProfit,
-//     od.orderName,
-//     od.orderDate,
-//     od.hairstyleName,
-//     od.description,
-//     od.costOfHair,
-//     od.vishanga,
-//     od.HairDresserAmount,
-//     od.officeAmount,
-//     od.receiptNumber,
-//     od.orderStatus  -- Include order status in output
-// FROM 
-//     HairDresserAggregates ha
-// LEFT JOIN 
-//     OrderDetails od ON ha.hairDresserId = od.hairDresserId
-// CROSS JOIN 
-//     TotalOfficeAmount toa
-// CROSS JOIN 
-//     TotalExpenses te
-// ORDER BY 
-//     ha.hairDresserName, od.orderDate;
-// `,
+    
+  getOrders: `WITH OrderDetails AS (
+    SELECT
+        o.hairDresserId,
+        o.name AS orderName,
+        o.date AS orderDate,
+        o.receiptNumber AS receiptNumber,
+        hs.HairDresserAmount,
+        hs.officeAmount,
+        hs.description,
+        hs.costOfHair,
+        hs.vishanga,
+        hs.name AS hairstyleName
+    FROM
+        orders o
+    JOIN
+        hairStyle hs ON o.hairstyleId = hs.id
+    WHERE
+        o.companyId = ?
+        AND o.branchId = ?
+        AND o.status = ?  -- Condition for orderStatus
+        AND DATE(o.date) = CURRENT_DATE
+    GROUP BY
+        o.receiptNumber, o.hairDresserId, o.name, o.date, hs.HairDresserAmount,
+        hs.officeAmount, hs.description, hs.costOfHair, hs.vishanga, hs.name
+),
+HairDresserAggregates AS (
+    SELECT
+        hd.id AS hairDresserId,
+        hd.name AS hairDresserName,
+        SUM(hs.HairDresserAmount) AS totalHairDresserAmount,
+        SUM(hs.officeAmount) AS totalOfficeAmount
+    FROM
+        orders o
+    JOIN
+        hairStyle hs ON o.hairstyleId = hs.id
+    JOIN
+        hairdresser hd ON o.hairDresserId = hd.id
+    WHERE
+        o.companyId = ?
+        AND o.branchId = ?
+        AND o.status = ?  -- Condition for orderStatus
+        AND DATE(o.date) = CURRENT_DATE
+    GROUP BY
+        hd.id, hd.name
+),
+TotalOfficeAmount AS (
+    SELECT
+        SUM(hs.officeAmount) AS overallTotalOfficeAmount,
+        SUM(hs.hairDresserAmount) AS overallTotalHairDresserAmount,
+        SUM(hs.costOfHair) AS overallTotalCostOfHair,
+        SUM(hs.vishanga) AS overallTotalVishanga,
+        SUM(hs.amount) AS overallTotalAmountPaid
+    FROM
+        orders o
+    JOIN
+        hairStyle hs ON o.hairstyleId = hs.id
+    WHERE
+        o.companyId = ?
+        AND o.branchId = ?
+        AND o.status = ?  -- Condition for orderStatus
+        AND DATE(o.date) = CURRENT_DATE
+),
+TotalExpenses AS (
+    SELECT
+        SUM(e.amount) AS overallTotalExpenses
+    FROM
+        expenses e
+    WHERE
+        e.companyId = ?
+        AND e.branchId = ?
+        AND DATE(e.date) = CURRENT_DATE
+)
+SELECT DISTINCT
+    ha.hairDresserName,
+    ha.totalHairDresserAmount,
+    ha.totalOfficeAmount,
+    toa.overallTotalOfficeAmount,
+    toa.overallTotalHairDresserAmount,
+    toa.overallTotalCostOfHair,
+    toa.overallTotalVishanga,
+    toa.overallTotalAmountPaid,
+    te.overallTotalExpenses,
+    (toa.overallTotalOfficeAmount - te.overallTotalExpenses) AS actualTotalProfit,
+    od.orderName,
+    od.orderDate,
+    od.hairstyleName,
+    od.description,
+    od.costOfHair,
+    od.vishanga,
+    od.HairDresserAmount,
+    od.officeAmount,
+    od.receiptNumber
+FROM
+    HairDresserAggregates ha
+JOIN
+    OrderDetails od ON ha.hairDresserId = od.hairDresserId
+JOIN
+    TotalOfficeAmount toa
+JOIN
+    TotalExpenses te
+ORDER BY
+    ha.hairDresserName, od.orderDate;
+`,
   getOrdersByRange: `WITH OrderDetails AS (
     SELECT 
         o.hairDresserId,
