@@ -2,17 +2,23 @@ const connectionPoolWithRetry = require('../../database/db_connection');
 const queries = require('../../database/queries');
 
 const getOrders = async (req, res) => {
+  const { companyId, branchId, orderStatus } = req.body;
+
+  console.log(`Received params - companyId: ${companyId}, branchId: ${branchId}, orderStatus: ${orderStatus}`);
+
   try {
-    const { companyId, branchId } = req.body;
     const connectionPool = await connectionPoolWithRetry();
-    connectionPool.query(queries.getOrders, [companyId, branchId,companyId, branchId,companyId, branchId,companyId, branchId], (error, results) => {
+    const queryParams = [companyId, branchId, orderStatus, companyId, branchId, orderStatus, companyId, branchId, orderStatus, companyId, branchId];    
+    connectionPool.query(queries.getOrders, queryParams, (error, results) => {
       if (error) {
         console.error('Error fetching orders:', error);
         return res.status(500).json({ message: 'Internal Server Error' });
       }
+      
       if (results.length === 0) {
         return res.status(404).json({ message: 'No orders were recorded today' });
       }
+
       let overallTotalOfficeAmount = 0;
       let overallTotalVishanga = 0;
       let overallTotalCostOfHair = 0;
@@ -23,6 +29,7 @@ const getOrders = async (req, res) => {
       const hairDresserDict = {};
 
       results.forEach(row => {
+        // Initialize overall totals
         if (overallTotalOfficeAmount === 0) {
           overallTotalOfficeAmount = row.overallTotalOfficeAmount;
           overallTotalVishanga = row.overallTotalVishanga;
@@ -32,15 +39,18 @@ const getOrders = async (req, res) => {
           actualTotalProfit = row.actualTotalProfit;
           overallTotalAmountPaid = row.overallTotalAmountPaid;
         }
+
+        // Populate hairdresser details
         if (!hairDresserDict[row.hairDresserName]) {
           hairDresserDict[row.hairDresserName] = {
             hairDresserName: row.hairDresserName,
             totalHairDresserAmount: row.totalHairDresserAmount,
             totalOfficeAmount: row.totalOfficeAmount,
             overallTotalAmountPaid: row.overallTotalAmountPaid,
-            orderNames: []
+            orderNames: [],
           };
         }
+
         hairDresserDict[row.hairDresserName].orderNames.push({
           name: row.orderName,
           date: row.orderDate,
@@ -48,23 +58,23 @@ const getOrders = async (req, res) => {
           description: row.description,
           costOfHair: row.costOfHair,
           vishanga: row.vishanga,
-          hairDresserAmount: row.HairDresserAmount,
+          hairDresserAmount: row.hairDresserAmount,
           officeAmount: row.officeAmount,
-          receiptNumber: row.receiptNumber
+          receiptNumber: row.receiptNumber,
         });
       });
 
       const orders = Object.values(hairDresserDict);
       res.status(200).json({
         message: 'Orders fetched successfully',
-        overallTotalOfficeAmount: overallTotalOfficeAmount,
-        overallTotalVishanga: overallTotalVishanga,
-        overallTotalCostOfHair: overallTotalCostOfHair,
-        overallTotalHairDresserAmount: overallTotalHairDresserAmount,
-        overallTotalExpenses: overallTotalExpenses,
-        actualTotalProfit: actualTotalProfit,
-        overallTotalAmountPaid: overallTotalAmountPaid,
-        orders: orders
+        overallTotalOfficeAmount,
+        overallTotalVishanga,
+        overallTotalCostOfHair,
+        overallTotalHairDresserAmount,
+        overallTotalExpenses,
+        actualTotalProfit,
+        overallTotalAmountPaid,
+        orders,
       });
     });
   } catch (err) {
