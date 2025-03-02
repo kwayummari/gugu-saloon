@@ -3,15 +3,16 @@ const queries = require('../../database/queries');
 
 const getCustomersCount = async (req, res) => {
   try {
-    const { companyId, branchId } = req.body;
-    console.log(`Received params - companyId: ${companyId}, branchId: ${branchId}`);
-
+    const { companyId, branchId,status } = req.body;
+    console.log(`Received params - companyId: ${companyId}, branchId: ${branchId} status: ${status}`);
+    
+     
     const connectionPool = await connectionPoolWithRetry();
     console.log('Connected to MySQL database.');
 
     connectionPool.query(
       queries.getAllCustomersCount,
-      [companyId, branchId],
+      [companyId, branchId, status],
       (error, results) => {
         if (error) {
           console.error('Error fetching customer count:', error);
