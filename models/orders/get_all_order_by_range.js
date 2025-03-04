@@ -6,17 +6,22 @@ const getOrdersByRange = async (req, res) => {
     const { startDate, endDate, companyId, branchId, orderStatus } = req.body;
     console.log(req.body);
 
+    // Ensure startDate and endDate are provided
+    if (!startDate || !endDate) {
+      return res.status(400).json({ message: 'Start date and end date are required.' });
+    }
+
     // Using the promise API from mysql2
     const connectionPool = await connectionPoolWithRetry();
 
-    // Replace the callback query with promise-based query
+    // Replace the callback query with a promise-based query
     const [results] = await connectionPool.promise().query(
       queries.getOrdersByRange,
       [
-        companyId, branchId, orderStatus, startDate, endDate,
-        companyId, branchId, orderStatus, startDate, endDate,
-        companyId, branchId, orderStatus, startDate, endDate,
-        companyId, branchId, orderStatus, startDate, endDate
+        companyId, branchId, orderStatus, startDate, endDate, // For HairDresserAggregates
+        companyId, branchId, orderStatus, startDate, endDate, // For OrderDetails
+        companyId, branchId, orderStatus, startDate, endDate, // For TotalOfficeAmount
+        companyId, branchId, startDate, endDate // For ExpensesTotal
       ]
     );
 
@@ -65,13 +70,13 @@ const getOrdersByRange = async (req, res) => {
     const orders = Object.values(hairDresserDict);
     res.status(200).json({
       message: 'Orders fetched successfully',
-      overallTotalOfficeAmount: overallTotalOfficeAmount,
-      overallTotalVishanga: overallTotalVishanga,
-      overallTotalCostOfHair: overallTotalCostOfHair,
-      overallTotalHairDresserAmount: overallTotalHairDresserAmount,
-      overallTotalAmountPaid: overallTotalAmountPaid,
-      actualExpenses: actualExpenses,
-      orders: orders
+      overallTotalOfficeAmount,
+      overallTotalVishanga,
+      overallTotalCostOfHair,
+      overallTotalHairDresserAmount,
+      overallTotalAmountPaid,
+      actualExpenses,
+      orders
     });
   } catch (err) {
     console.error('Error initializing connection:', err);
@@ -82,4 +87,3 @@ const getOrdersByRange = async (req, res) => {
 module.exports = {
   getOrdersByRange,
 };
-     
