@@ -4,15 +4,20 @@ const queries = require('../../database/queries');
 const getCustomersCount = async (req, res) => {
   try {
     // Extracting parameters from the request body
-    const { companyId, branchId, orderStatus } = req.body;
+    const { companyId, branchId, orderStatus, startDate, endDate } = req.body;
 
     // Validate orderStatus to ensure it's 0 or 1
     if (![0, 1].includes(orderStatus)) {
       return res.status(400).json({ message: 'Invalid order status. It should be 0 or 1.' });
     }
 
+    // Validate startDate and endDate
+    if (!startDate || !endDate) {
+      return res.status(400).json({ message: 'Start date and end date are required.' });
+    }
+
     // Logging the received parameters
-    console.log(`Received params - companyId: ${companyId}, branchId: ${branchId}, orderStatus: ${orderStatus}`);
+    console.log(`Received params - companyId: ${companyId}, branchId: ${branchId}, orderStatus: ${orderStatus}, startDate: ${startDate}, endDate: ${endDate}`);
 
     // Getting the connection pool and ensuring proper connection
     const connectionPool = await connectionPoolWithRetry();
@@ -21,7 +26,7 @@ const getCustomersCount = async (req, res) => {
     // Using promise-based query for better async handling
     const [results] = await connectionPool.promise().query(
       queries.getAllCustomersCount,
-      [companyId, branchId, orderStatus] // Passing the validated orderStatus
+      [startDate, endDate, companyId, branchId, orderStatus] // Pass parameters in the correct order
     );
 
     console.log('Query executed successfully.');
@@ -37,7 +42,7 @@ const getCustomersCount = async (req, res) => {
     const totalCustomers = results.map(result => result.customerCount || 0);
     console.log(`Total customers fetched: ${totalCustomers}`);
 
-    // Returning the total customer count in the response
+    // Returning the total customer count in the response as an array
     res.status(200).json({
       message: 'Customers count fetched successfully',
       totalCustomers: totalCustomers // Returning the count as an array
