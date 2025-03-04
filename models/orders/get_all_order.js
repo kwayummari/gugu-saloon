@@ -2,21 +2,50 @@ const connectionPoolWithRetry = require('../../database/db_connection');
 const queries = require('../../database/queries');
 
 const getOrders = async (req, res) => {
-  const { companyId, branchId, orderStatus } = req.body;
+  const { companyId, branchId, orderStatus, startDate, endDate } = req.body;
 
-  console.log(`Received params - companyId: ${companyId}, branchId: ${branchId}, orderStatus: ${orderStatus}`);
+  console.log(`Received params - companyId: ${companyId}, branchId: ${branchId}, orderStatus: ${orderStatus}, startDate: ${startDate}, endDate: ${endDate}`);
+
+  // Validate startDate and endDate
+  if (!startDate || !endDate) {
+    return res.status(400).json({ message: 'Start date and end date are required.' });
+  }
 
   try {
     const connectionPool = await connectionPoolWithRetry();
-    const queryParams = [companyId, branchId, orderStatus, companyId, branchId, orderStatus, companyId, branchId, orderStatus, companyId, branchId];    
+
+    // Prepare the query parameters
+    const queryParams = [
+      companyId,
+      branchId,
+      orderStatus,
+      startDate, // Start date for the SQL query
+      endDate,   // End date for the SQL query
+      companyId,
+      branchId,
+      orderStatus,
+      startDate, // Start date for HairDresserAggregates
+      endDate,   // End date for HairDresserAggregates
+      companyId,
+      branchId,
+      orderStatus,
+      startDate, // Start date for TotalOfficeAmount
+      endDate,   // End date for TotalOfficeAmount
+      companyId,
+      branchId,
+      startDate, // Start date for TotalExpenses
+      endDate    // End date for TotalExpenses
+    ];
+
+    // Execute the query
     connectionPool.query(queries.getOrders, queryParams, (error, results) => {
       if (error) {
         console.error('Error fetching orders:', error);
         return res.status(500).json({ message: 'Internal Server Error' });
       }
-      
+
       if (results.length === 0) {
-        return res.status(404).json({ message: 'No orders were recorded today' });
+        return res.status(404).json({ message: 'No orders were recorded in the given date range' });
       }
 
       let overallTotalOfficeAmount = 0;
@@ -58,7 +87,7 @@ const getOrders = async (req, res) => {
           description: row.description,
           costOfHair: row.costOfHair,
           vishanga: row.vishanga,
-          hairDresserAmount: row.hairDresserAmount,
+          hairDresserAmount: row.HairDresserAmount,
           officeAmount: row.officeAmount,
           receiptNumber: row.receiptNumber,
         });
