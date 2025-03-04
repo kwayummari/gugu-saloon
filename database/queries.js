@@ -18,7 +18,7 @@ WHERE user.role != 1 AND user.companyId = '1';
 getAllCustomersCount: `
 SELECT COUNT(*) AS customerCount
 FROM orders
-WHERE DATE(date) = CURDATE()
+WHERE DATE(date) BETWEEN ? AND ?
   AND companyId = ?
   AND branchId = ?
   AND \`status\` = ?
@@ -223,7 +223,7 @@ JOIN
         o.companyId = ?
         AND o.branchId = ?
         AND o.status = ?  -- Condition for orderStatus
-        AND DATE(o.date) = CURRENT_DATE
+        AND DATE(o.date) BETWEEN ? AND ?  -- Use startDate and endDate
     GROUP BY
         o.receiptNumber, o.hairDresserId, o.name, o.date, hs.HairDresserAmount,
         hs.officeAmount, hs.description, hs.costOfHair, hs.vishanga, hs.name
@@ -244,7 +244,7 @@ HairDresserAggregates AS (
         o.companyId = ?
         AND o.branchId = ?
         AND o.status = ?  -- Condition for orderStatus
-        AND DATE(o.date) = CURRENT_DATE
+        AND DATE(o.date) BETWEEN ? AND ?  -- Use startDate and endDate
     GROUP BY
         hd.id, hd.name
 ),
@@ -263,7 +263,7 @@ TotalOfficeAmount AS (
         o.companyId = ?
         AND o.branchId = ?
         AND o.status = ?  -- Condition for orderStatus
-        AND DATE(o.date) = CURRENT_DATE
+        AND DATE(o.date) BETWEEN ? AND ?  -- Use startDate and endDate
 ),
 TotalExpenses AS (
     SELECT
@@ -273,7 +273,7 @@ TotalExpenses AS (
     WHERE
         e.companyId = ?
         AND e.branchId = ?
-        AND DATE(e.date) = CURRENT_DATE
+        AND DATE(e.date) BETWEEN ? AND ?  -- Use startDate and endDate
 )
 SELECT DISTINCT
     ha.hairDresserName,
@@ -306,7 +306,7 @@ JOIN
 ORDER BY
     ha.hairDresserName, od.orderDate;
 `,
-  getOrdersByRange: `WITH OrderDetails AS (
+getOrdersByRange: `WITH OrderDetails AS (
     SELECT 
         o.hairDresserId,
         o.name AS orderName,
