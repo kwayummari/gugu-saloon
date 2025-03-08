@@ -18,7 +18,7 @@ const addExpenses = async (req, res) => {
         return res.status(400).json({ message: errors.array()[0].msg });
     }
 
-    const { valueHolder, amount, branchId, companyId, description, managerId } = req.body;
+    const { valueHolder, amount,companyId, branchId,  description, managerId } = req.body;
     let connection;
 
     try {
@@ -43,7 +43,7 @@ const addExpenses = async (req, res) => {
 
         // Insert expense into database
         await queryAsync(queries.addExpenses, [
-            valueHolder, amount, description, branchId, companyId, expenseStatus, expenseDate
+            valueHolder, amount, description,companyId, branchId,  expenseStatus, expenseDate
         ]);
 
         return res.status(200).json({ message: 'Expense added successfully' });
