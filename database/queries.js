@@ -375,6 +375,7 @@ ExpensesTotal AS (
     WHERE 
         e.companyId = ? 
         AND e.branchId = ? 
+        AND e.expense_status = ?
         AND e.date BETWEEN ? AND ?
 )
 SELECT DISTINCT
@@ -420,6 +421,7 @@ JOIN
 WHERE 
     e.companyId = ? 
     AND e.branchId = ? 
+    AND e.expense_status = ?
     AND e.date BETWEEN ? AND ?;
 `,
   getHairstyleById: "SELECT * FROM hairStyle WHERE id = ?",
@@ -456,8 +458,9 @@ WHERE companyId = ?
 AND branchId = ?
 AND DATE(expenses.date) = CURDATE();
 `,
-  addExpenses:
-    "INSERT INTO expenses (expense_type_id, amount, description, branchId, companyId) VALUES (?, ?, ?, ?, ?)",
+addExpenses:
+"INSERT INTO expenses (expense_type_id, amount, description, branchId, companyId, expense_status, date) VALUES (?, ?, ?, ?, ?, ?, ?)"
+
 };
 
 module.exports = queries;
