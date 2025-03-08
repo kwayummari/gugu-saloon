@@ -21,7 +21,7 @@ const getOrdersByRange = async (req, res) => {
         companyId, branchId, orderStatus, startDate, endDate, // For HairDresserAggregates
         companyId, branchId, orderStatus, startDate, endDate, // For OrderDetails
         companyId, branchId, orderStatus, startDate, endDate, // For TotalOfficeAmount
-        companyId, branchId, startDate, endDate // For ExpensesTotal
+        companyId, branchId, orderStatus,startDate, endDate // For ExpensesTotal
       ]
     );
 
