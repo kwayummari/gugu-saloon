@@ -459,7 +459,7 @@ AND branchId = ?
 AND DATE(expenses.date) = CURDATE();
 `,
 addExpenses:
-"INSERT INTO expenses (expense_type_id, amount, description, branchId, companyId, expense_status, date) VALUES (?, ?, ?, ?, ?, ?, ?)"
+"INSERT INTO expenses (expense_type_id, amount, description,companyId, branchId,  expense_status, date) VALUES (?, ?, ?, ?, ?, ?, ?)"
 
 };
 
