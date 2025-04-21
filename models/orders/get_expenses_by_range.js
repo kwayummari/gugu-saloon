@@ -11,7 +11,6 @@ const getExpensesByRange = async (req, res) => {
 
     const params = [companyId, branchId, orderStatus, startDate, endDate];
     console.log('🧾 SQL Params:', params);
-    console.log('🔍 SQL Query:\n', queries.getExpensesByRange);
 
     connectionPool.query(queries.getExpensesByRange, params, (error, results) => {
       if (error) {
@@ -20,7 +19,6 @@ const getExpensesByRange = async (req, res) => {
         return res.status(500).json({ message: 'Internal Server Error', error: error.sqlMessage });
       }
 
-      console.log('✅ Query Result:', results);
 
       if (results.length === 0) {
         console.log('⚠️ No expenses found for given criteria.');
