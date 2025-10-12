@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 const { body, validationResult } = require('express-validator');
 const queries = require('../../database/queries');
 const xss = require('xss');
+const { sendSMS, sendOrderConfirmation } = require('../../services/smsService');
+const { getActiveShift } = require('../../services/shiftService');
 
 // Validator functions for each field
 const validateOrderFields = [
@@ -32,6 +34,18 @@ const registerOrder = async (req, res) => {
         const sanitizedName = xss(name);
         const sanitizedPhone = xss(phone);
 
+        // Check for active shift - PREVENT ORDERS WITHOUT ACTIVE SHIFT
+        const shiftCheck = await getActiveShift(branchId);
+        if (!shiftCheck.success || !shiftCheck.shift) {
+            return res.status(403).json({
+                message: 'No active shift. Manager must login to start shift before creating orders.',
+                requiresShift: true
+            });
+        }
+
+        const activeShiftId = shiftCheck.shift.id;
+        console.log(`📦 Order will be linked to shift ID: ${activeShiftId}`);
+
         const connectionPool = await connectionPoolWithRetry();
 
         // Get current date and time
@@ -45,32 +59,170 @@ const registerOrder = async (req, res) => {
 
         // Format date as YYYY-MM-DD
         const orderDate = now.toISOString().split('T')[0];
+        const orderTime = now.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
         console.log("Order Date:", orderDate);
-        // First, get the manager status
-        connectionPool.query(queries.getStatus, [managerId], (error, result) => {
+
+        // Get hairstyle and hairdresser details for SMS
+        connectionPool.query('SELECT name FROM hairStyle WHERE id = ?', [hairStyleId], (error, hairStyleResult) => {
             if (error) {
-                console.log(error);
-                return res.status(500).json({ message: error.message });
+                console.error('Error fetching hairstyle:', error);
             }
 
-            if (result.length === 0) {
-                return res.status(404).json({ message: 'Manager not found' });
-            }
-
-            const managerStatus = result[0].status;
-
-            // Insert order using add_order_with_date query
-            connectionPool.query(
-                queries.add_order_with_date, // Using the new query to include the order date
-                [sanitizedName, sanitizedPhone, hairStyleId, hairDresserId, randomNumber, managerStatus, companyId, branchId, orderDate],
-                (error, result) => {
-                    if (error) {
-                        console.log(error);
-                        return res.status(500).json({ message: error.message });
-                    }
-                    return res.status(200).json({ message: 'Order created successfully', order: result });
+            connectionPool.query('SELECT name FROM hairdresser WHERE id = ?', [hairDresserId], (error, hairdresserResult) => {
+                if (error) {
+                    console.error('Error fetching hairdresser:', error);
                 }
-            );
+
+                const hairStyleName = hairStyleResult && hairStyleResult.length > 0 ? hairStyleResult[0].name : 'Unknown';
+                const hairdresserName = hairdresserResult && hairdresserResult.length > 0 ? hairdresserResult[0].name : 'Unknown';
+
+                // Get branch name
+                connectionPool.query('SELECT name FROM branch WHERE id = ?', [branchId], (error, branchResult) => {
+                    if (error) {
+                        console.error('Error fetching branch:', error);
+                    }
+
+                    const branchName = branchResult && branchResult.length > 0 ? branchResult[0].name : 'Unknown Branch';
+
+                    // Get hairstyle amount for this order
+                    connectionPool.query('SELECT amount FROM hairStyle WHERE id = ?', [hairStyleId], (error, amountResult) => {
+                        if (error) {
+                            console.error('Error fetching hairstyle amount:', error);
+                        }
+
+                        const orderAmount = amountResult && amountResult.length > 0 ? amountResult[0].amount : 0;
+
+                        // Get today's statistics BEFORE adding the order (for previous balance)
+                        const todayStatsQuery = `
+                        SELECT 
+                            COUNT(*) as orderCount,
+                            SUM(hs.amount) as totalAmount,
+                            SUM(hs.officeAmount) as totalOfficeAmount,
+                            SUM(hs.hairDresserAmount) as totalHairdresserAmount
+                        FROM orders o
+                        JOIN hairStyle hs ON o.hairStyleId = hs.id
+                        WHERE o.date = ? AND o.companyId = ? AND o.branchId = ?
+                    `;
+
+                        connectionPool.query(todayStatsQuery, [orderDate, companyId, branchId], (error, previousStatsResult) => {
+                            const previousOrderCount = previousStatsResult && previousStatsResult.length > 0 ? (previousStatsResult[0].orderCount || 0) : 0;
+                            const previousTotalAmount = parseFloat(previousStatsResult && previousStatsResult.length > 0 ? (previousStatsResult[0].totalAmount || 0) : 0);
+                            const previousTotalOfficeAmount = parseFloat(previousStatsResult && previousStatsResult.length > 0 ? (previousStatsResult[0].totalOfficeAmount || 0) : 0);
+                            const previousTotalHairdresserAmount = parseFloat(previousStatsResult && previousStatsResult.length > 0 ? (previousStatsResult[0].totalHairdresserAmount || 0) : 0);
+
+                            // Get this order's breakdown
+                            connectionPool.query('SELECT officeAmount, hairDresserAmount FROM hairStyle WHERE id = ?', [hairStyleId], (error, styleBreakdown) => {
+                                const thisOrderOfficeAmount = parseFloat(styleBreakdown && styleBreakdown.length > 0 ? styleBreakdown[0].officeAmount : 0);
+                                const thisOrderHairdresserAmount = parseFloat(styleBreakdown && styleBreakdown.length > 0 ? styleBreakdown[0].hairDresserAmount : 0);
+
+                                // Calculate new totals (ensure all are numbers)
+                                const newOrderCount = previousOrderCount + 1;
+                                const newTotalAmount = previousTotalAmount + parseFloat(orderAmount);
+                                const newTotalOfficeAmount = previousTotalOfficeAmount + thisOrderOfficeAmount;
+                                const newTotalHairdresserAmount = previousTotalHairdresserAmount + thisOrderHairdresserAmount;
+
+                                console.log('📊 Order Calculation Debug:');
+                                console.log('Previous Amount:', previousTotalAmount, 'Order Amount:', parseFloat(orderAmount), 'New Total:', newTotalAmount);
+                                console.log('Previous Office:', previousTotalOfficeAmount, 'This Office:', thisOrderOfficeAmount, 'New Office:', newTotalOfficeAmount);
+                                console.log('Previous Hairdresser:', previousTotalHairdresserAmount, 'This Hairdresser:', thisOrderHairdresserAmount, 'New Hairdresser:', newTotalHairdresserAmount);
+
+                                // Insert order using add_order_with_shift query
+                                const orderParams = [sanitizedName, sanitizedPhone, hairStyleId, hairDresserId, randomNumber, companyId, branchId, orderDate, activeShiftId];
+                                console.log('Order params:', orderParams);
+                                console.log('Active shift ID:', activeShiftId);
+
+                                // Get today's expenses
+                                connectionPool.query(
+                                    'SELECT SUM(amount) as totalExpenses FROM expenses WHERE date = ? AND companyId = ? AND branchId = ?',
+                                    [orderDate, companyId, branchId],
+                                    (error, expensesResult) => {
+                                        const todayTotalExpenses = parseFloat(expensesResult && expensesResult.length > 0 ? (expensesResult[0].totalExpenses || 0) : 0);
+
+                                        connectionPool.query(
+                                            queries.add_order_with_shift,
+                                            orderParams,
+                                            (error, result) => {
+                                                if (error) {
+                                                    console.log(error);
+                                                    return res.status(500).json({ message: error.message });
+                                                }
+
+                                                // Helper function to format numbers safely
+                                                const formatAmount = (value) => {
+                                                    const num = parseFloat(value) || 0;
+                                                    return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                                                };
+
+                                                // Format amounts with thousands separator
+                                                const formattedOrderAmount = formatAmount(orderAmount);
+                                                const formattedPreviousAmount = formatAmount(previousTotalAmount);
+                                                const formattedNewAmount = formatAmount(newTotalAmount);
+                                                const formattedPreviousOffice = formatAmount(previousTotalOfficeAmount);
+                                                const formattedNewOffice = formatAmount(newTotalOfficeAmount);
+                                                const formattedPreviousHairdresser = formatAmount(previousTotalHairdresserAmount);
+                                                const formattedNewHairdresser = formatAmount(newTotalHairdresserAmount);
+                                                const formattedExpenses = formatAmount(todayTotalExpenses);
+
+                                                // Calculate net profit (office amount - expenses)
+                                                const netProfit = newTotalOfficeAmount - todayTotalExpenses;
+                                                const formattedNetProfit = formatAmount(netProfit);
+
+                                                // Build balance update message with full breakdown
+                                                const balanceUpdate = `\n\nPREVIOUS BALANCE:\nOrders: ${previousOrderCount}\nRevenue: ${formattedPreviousAmount} Tsh\nOffice: ${formattedPreviousOffice} Tsh\n\nCURRENT BALANCE:\nOrders: ${newOrderCount}\nRevenue: ${formattedNewAmount} Tsh\nOffice Amount: ${formattedNewOffice} Tsh\nHairdresser Amount: ${formattedNewHairdresser} Tsh\nExpenses: ${formattedExpenses} Tsh\n\nNET PROFIT: ${formattedNetProfit} Tsh\n(Office Amount - Expenses)`;
+
+                                                // Send SMS notification to admin (async, don't wait)
+                                                const smsMessage = `NEW ORDER ALERT\n\nReceipt: ${randomNumber}\nCustomer: ${sanitizedName}\nPhone: ${sanitizedPhone}\nService: ${hairStyleName}\nAmount: ${formattedOrderAmount} Tsh\nHairdresser: ${hairdresserName}\nBranch: ${branchName}\nTime: ${orderTime}${balanceUpdate}\n\n- Gugu Beauty Saloon`;
+
+                                                // Send SMS to admin
+                                                sendSMS(process.env.ADMIN_PHONE, smsMessage)
+                                                    .then((smsResult) => {
+                                                        if (smsResult.success) {
+                                                            console.log('✅ Admin notified of new order via SMS');
+                                                        } else {
+                                                            console.error('❌ Failed to send admin SMS:', smsResult.error);
+                                                        }
+                                                    })
+                                                    .catch((err) => {
+                                                        console.error('❌ Admin SMS notification error:', err.message);
+                                                    });
+
+                                                // Send SMS confirmation to customer
+                                                sendOrderConfirmation(
+                                                    sanitizedPhone,
+                                                    sanitizedName,
+                                                    hairStyleName,
+                                                    hairdresserName,
+                                                    randomNumber,
+                                                    orderAmount
+                                                )
+                                                    .then((customerSmsResult) => {
+                                                        if (customerSmsResult.success) {
+                                                            console.log('✅ Customer notified of order via SMS:', sanitizedPhone);
+                                                        } else {
+                                                            console.error('❌ Failed to send customer SMS:', customerSmsResult.error);
+                                                        }
+                                                    })
+                                                    .catch((err) => {
+                                                        console.error('❌ Customer SMS notification error:', err.message);
+                                                    });
+
+                                                return res.status(200).json({ message: 'Order created successfully', order: result });
+                                            }
+                                        );
+                                    }
+                                );
+                            });
+                        });
+                    });
+                });
+            });
         });
 
     } catch (err) {

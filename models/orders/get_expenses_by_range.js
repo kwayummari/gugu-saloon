@@ -3,13 +3,13 @@ const queries = require('../../database/queries');
 
 const getExpensesByRange = async (req, res) => {
   try {
-    const { startDate, endDate, companyId, branchId, orderStatus } = req.body;
+    const { startDate, endDate, companyId, branchId } = req.body;
 
     console.log('📥 Incoming Request Body:', req.body);
 
     const connectionPool = await connectionPoolWithRetry();
 
-    const params = [companyId, branchId, orderStatus, startDate, endDate];
+    const params = [companyId, branchId, startDate, endDate];
     console.log('🧾 SQL Params:', params);
 
     connectionPool.query(queries.getExpensesByRange, params, (error, results) => {

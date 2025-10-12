@@ -38,11 +38,25 @@ app.use(
   })
 );
 
+// Configure CORS - only allow requests from specific origins
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',')
+  : ['http://localhost:4000', 'http://localhost:3001'];
+
 app.use(cors({
-  origin: '*',
-  // origin: ['*', 'https://senjaro.app', 'http://localhost:3001'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or Postman)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true, // Allow cookies to be sent
 }));
 
 const limiter = rateLimit({
@@ -58,9 +72,9 @@ const swaggerOptions = {
     info: {
       title: 'GUGU API',
       description: 'This API provides endpoints to manage activities on an GUGU platform. ' +
-      'It allows users to create, retrieve, update, and delete various learning activities such as ' +
-      'courses, quizzes, assignments, discussions, and more. Authentication and user-related functionalities ' +
-      'are also included to manage users enrolled in activities and their progress.',
+        'It allows users to create, retrieve, update, and delete various learning activities such as ' +
+        'courses, quizzes, assignments, discussions, and more. Authentication and user-related functionalities ' +
+        'are also included to manage users enrolled in activities and their progress.',
       version: '1.0.0',
     },
   },
@@ -82,5 +96,5 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-PORT.keepAliveTimeout = process.env.API_KEEPALIVETIMEOUT; 
+PORT.keepAliveTimeout = process.env.API_KEEPALIVETIMEOUT;
 PORT.headersTimeout = process.env.API_HEADERSTIMEOUT; 

@@ -15,7 +15,7 @@ INNER JOIN branch ON user.branch = branch.id
 INNER JOIN roles ON user.role = roles.id
 WHERE user.role != 1 AND user.companyId = '1';
 `,
-getAllCustomersCount: `
+  getAllCustomersCount: `
 SELECT COUNT(*) AS customerCount
 FROM orders
 WHERE DATE(date) BETWEEN ? AND ?
@@ -66,8 +66,9 @@ JOIN
     hairStyle hs ON mf.hairStyleId = hs.id;
 `,
   getUserById: "SELECT * FROM hairdresser WHERE id = ?",
-  login: "SELECT * FROM user WHERE email = ?",
-  loginHairDresser: "SELECT * FROM hairdresser WHERE name = ?",
+  login: "SELECT * FROM user WHERE email = ? OR phone = ?",
+  loginHairDresser: "SELECT * FROM hairdresser WHERE name = ? OR email = ? OR phone = ?",
+  insertLoginHistory: "INSERT INTO login_history (user_id, user_name, user_type, login_time, ip_address, user_agent, status, sms_sent, sms_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
   register_user:
     "INSERT INTO user (fullname, phone, email, branch, role, password, companyId) VALUES (?, ?, ?, ?, ?, ?, ?)",
   check_user_existence:
@@ -185,9 +186,11 @@ JOIN
     JOIN 
         hairStyle hs ON o.hairStyleId = hs.id
     WHERE 
-        o.companyId = ? AND o.branchId = ? AND DATE(o.date) = CURDATE()
+        o.companyId = ? AND o.branchId = ? AND o.date = ?
     GROUP BY 
-        o.hairDresserId, h.name;
+        o.hairDresserId, h.name, o.date
+    ORDER BY 
+        h.name ASC;
     `,
   //     performReconciliation: `DELETE FROM orders
   // WHERE id NOT IN (
@@ -202,7 +205,7 @@ JOIN
   // );
   // `,
   performReconciliation: `SELECT * FROM orders`,
-    
+
   getOrders: `WITH OrderDetails AS (
     SELECT
         o.hairDresserId,
@@ -306,7 +309,7 @@ JOIN
 ORDER BY
     ha.hairDresserName, od.orderDate;
 `,
-getOrdersByRange: `WITH OrderDetails AS (
+  getOrdersByRange: `WITH OrderDetails AS (
     SELECT 
         o.hairDresserId,
         o.name AS orderName,
@@ -375,7 +378,6 @@ ExpensesTotal AS (
     WHERE 
         e.companyId = ? 
         AND e.branchId = ? 
-        AND e.expense_status = ?
         AND e.date BETWEEN ? AND ?
 )
 SELECT DISTINCT
@@ -408,7 +410,7 @@ ORDER BY
     ha.hairDresserName, od.orderDate;
 `,
 
-  getExpensesByRange:`SELECT 
+  getExpensesByRange: `SELECT 
   e.*, 
   expenses_type.name AS expenseTypeName, 
   branch.name AS branchName
@@ -421,7 +423,6 @@ JOIN
 WHERE 
   e.companyId = ? 
   AND e.branchId = ? 
-  AND e.expense_status = ?
   AND e.date BETWEEN ? AND ?`,
   getHairstyleById: "SELECT * FROM hairStyle WHERE id = ?",
   check_for_hairdresser:
@@ -444,8 +445,10 @@ WHERE
     hd.hairdresserId = ?;
 `,
   add_order:
-    "INSERT INTO orders (name, phone, hairStyleId, hairDresserId, receiptNumber, status, companyId, branchId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-  add_order_with_date: `INSERT INTO orders (name, phone, hairStyleId, hairDresserId, receiptNumber, status,  companyId, branchId,date) 
+    "INSERT INTO orders (name, phone, hairStyleId, hairDresserId, receiptNumber, companyId, branchId) VALUES (?, ?, ?, ?, ?, ?, ?)",
+  add_order_with_date: `INSERT INTO orders (name, phone, hairStyleId, hairDresserId, receiptNumber, companyId, branchId, date) 
+VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+  add_order_with_shift: `INSERT INTO orders (name, phone, hairStyleId, hairDresserId, receiptNumber, companyId, branchId, date, shift_id) 
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 
   getStatus: "SELECT status FROM hairdresser WHERE id = ?",
@@ -457,8 +460,58 @@ WHERE companyId = ?
 AND branchId = ?
 AND DATE(expenses.date) = CURDATE();
 `,
-addExpenses:
-"INSERT INTO expenses (expense_type_id, amount, description,companyId, branchId,  expense_status, date) VALUES (?, ?, ?, ?, ?, ?, ?)"
+  addExpenses:
+    "INSERT INTO expenses (expense_type_id, amount, description, companyId, branchId, date) VALUES (?, ?, ?, ?, ?, ?)",
+  addExpensesWithShift:
+    "INSERT INTO expenses (expense_type_id, amount, description, companyId, branchId, date, shift_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+
+  // Shift Management Queries
+  getBranchShiftConfig: "SELECT has_shifts, shift_config FROM branch WHERE id = ?",
+
+  getActiveShift: `SELECT * FROM shifts 
+    WHERE branch_id = ? AND status = 'active' 
+    ORDER BY start_time DESC LIMIT 1`,
+
+  createShift: `INSERT INTO shifts 
+    (branch_id, manager_id, manager_name, shift_type, start_time, status) 
+    VALUES (?, ?, ?, ?, ?, 'active')`,
+
+  endShift: `UPDATE shifts SET 
+    status = 'ended',
+    end_time = ?,
+    total_orders = ?,
+    total_revenue = ?,
+    total_hairdresser_amount = ?,
+    total_office_amount = ?,
+    total_cost_of_hair = ?,
+    total_vishanga = ?,
+    total_expenses = ?,
+    net_profit = ?
+    WHERE id = ?`,
+
+  getShiftStatistics: `SELECT 
+    COUNT(o.id) as orderCount,
+    COALESCE(SUM(hs.amount), 0) as totalRevenue,
+    COALESCE(SUM(hs.hairDresserAmount), 0) as totalHairDresserAmount,
+    COALESCE(SUM(hs.officeAmount), 0) as totalOfficeAmount,
+    COALESCE(SUM(hs.costOfHair), 0) as totalCostOfHair,
+    COALESCE(SUM(hs.vishanga), 0) as totalVishanga
+    FROM orders o
+    JOIN hairStyle hs ON o.hairStyleId = hs.id
+    WHERE o.shift_id = ?`,
+
+  getShiftExpenses: `SELECT COALESCE(SUM(amount), 0) as totalExpenses 
+    FROM expenses 
+    WHERE shift_id = ?`,
+
+  getShiftById: "SELECT * FROM shifts WHERE id = ?",
+
+  getCurrentShiftOrders: `SELECT o.*, hs.name as hairStyleName, hs.amount, hd.name as hairDresserName
+    FROM orders o
+    JOIN hairStyle hs ON o.hairStyleId = hs.id
+    JOIN hairdresser hd ON o.hairDresserId = hd.id
+    WHERE o.shift_id = ?
+    ORDER BY o.created_at DESC`
 
 };
 

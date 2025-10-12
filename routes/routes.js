@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const { authenticateToken } = require('../middleware/auth');
 const { validateLogin, loginUser } = require('../models/authentication/login');
-const {validateLoginHairDresser,loginHairDresser} = require('../models/authentication/loginHairDresser');
-const {validateUser,registerUser} = require('../models/authentication/register_user');
+const { validateLoginHairDresser, loginHairDresser } = require('../models/authentication/loginHairDresser');
+const { validateUser, registerUser } = require('../models/authentication/register_user');
 const getUsers = require('../models/authentication/get_users');
 const getPermissions = require('../models/permissions/get_permission')
 const getUserById = require('../models/authentication/get_user_by_id')
@@ -33,7 +34,7 @@ const { validateSupplier, registerSupplier } = require('../models/supplier/add_s
 const deleteSuppliers = require('../models/supplier/delete_supplier');
 const { validateEditingSupplier, editSupplier } = require('../models/supplier/edit_supplier');
 const { validateProduct, registerProduct } = require('../models/inventory/add_product');
-const {validateEditProduct,edit_product} = require('../models/inventory/edit_product');
+const { validateEditProduct, edit_product } = require('../models/inventory/edit_product');
 const getProduct = require('../models/inventory/get_product');
 const tax = require('../models/tax/get_tax');
 const deleteProducts = require('../models/inventory/delete_product');
@@ -57,68 +58,105 @@ const { validateHairdressers, postHairDresser } = require('../models/hairdresser
 const getHairDressings = require('../models/hairdresser/get_hairdressing');
 const getHairDressings2 = require('../models/hairdresser/get_hairdressing2');
 const { validateOrderFields, registerOrder } = require('../models/orders/add_order');
+const shiftController = require('../models/shifts/shiftController');
 const getExpenses = require('../models/expenses/get_expenses');
 const { validateExpenses, addExpenses } = require('../models/expenses/add_expenses');
 
+// ==========================================
+// PUBLIC ROUTES (No Authentication Required)
+// ==========================================
 router.post('/login', validateLogin, loginUser);
-router.post('/loginHairDresser',validateLoginHairDresser,loginHairDresser);
-router.post('/register_user',validateUser, registerUser);
-router.get('/users', getUsers.getAllUsers);
-router.post('/getUserById', getUserById.getUserById);
-router.post('/getUserByCompanyId', getUserByCompanyId.getUserByCompanyId);
-router.post('/getAllCustomers', getCustomers.getCustomers);
-router.post('/getAllCustomersCount', getCustomersCount.getCustomersCount);
-router.post('/getPermission', getPermissions.getPermissions);
-router.get('/getRoles', getAllRoles.getRoles);
-router.post('/updateRoles', updatePermissions.updatePermission);
-router.post('/getRolesById', getRolesById.getRolesById);
-router.post('/edit_role', validateEditRole, editRole);
-router.post('/getBranch', getBranches.getBranch);
-router.post('/getAllRoles', getRoles.getRoles);
-router.post('/deleteUserById', deleteUserById.deleteUsersById)
-router.post('/deleteHairDresser', deleteHairDresser.deleteHairDresser)
-router.post('/updateHairDressingStatus', updatesHairDressing.updateHairDressing)
-router.post('/delete_hairdresser_hairstyling', delete_hairdresser_hairstyling.delete_hairdresser_hairstyling)
-router.post('/disable_hairdressing', disableHairDressing.disableHairdressing)
-router.post('/register_role', validateRole, registerRole);
-router.post('/registerExpenseType', validateExpenseType, registerExpenseType);
-router.post('/edit_user', validateEditingUser, editUser);
-router.post('/deleteRole', deleteRoles.deleteRole)
-router.post('/deleteExpenses', deleteExpenses.deleteExpenses)
-// router.post('/edit_password', validateEditingPassword, editPassword);
-router.post('/register_branch', validateBranch, registerBranch);
-router.post('/edit_branch', validateEditBranch, editBranch);
-router.post('/delete_branch', deleteBranches.deleteBranch);
-router.post('/suppliers', getSuppliers.getSupplier);
-router.post('/register_supplier', validateSupplier, registerSupplier);
-router.post('/deleteSupplier', deleteSuppliers.deleteSupplier)
-router.post('/edit_supplier', validateEditingSupplier, editSupplier);
-router.post('/register_product', validateProduct, registerProduct);
-router.post('/edit_product', validateEditProduct,edit_product);
-router.post('/products', getProduct.getProducts);
-router.post('/tax', tax.getTax);
-router.post('/delete_product', deleteProducts.deleteProduct)
-router.post('/get_purchases', getPurchases.getPurchase)
-router.post('/getHairDresser', getAllHairDresser.getHairDressers);
-router.post('/getHairDresserById', getAllHairDresserByIds.getHairDressersById);
-router.post('/register_hairdresser', validateHairdresser, registerHairDresser);
-router.post('/register_hairStyle', validateHairStyle, registerHairStyle);
-router.post('/getHairStyle', getAllHairStyle.getMisukoById);
-router.post('/getAllHairStyle', getAllHairStyles.getMisuko);
-router.post('/getPayroll', getPayrolls.payroll);
-router.post('/reconciliation', performReconciliation.reconciliation);
-router.post('/getOrders', getAllOrders.getOrders);
-router.post('/getOrdersByRange', getAllOrdersByRange.getOrdersByRange);
-router.post('/getExpensesByRange', getExpensesByRange.getExpensesByRange);
-router.post('/getExpensesType', getExpensesType.getExpensesType);
-router.post('/deleteHairStyle', deleteHairStyles.deleteMisuko);
-router.post('/edit_hairStyle', validateEditMsuko, editMsuko);
-router.post('/edit_hairDresser', validateEditHairDresser, editHairDresser);
-router.post('/post_hairDresser', validateHairdressers, postHairDresser);
-router.post('/getHairDressing', getHairDressings.getHairDressing);
-router.post('/getHairDressing2', getHairDressings2.getHairDressing2);
-router.post('/addOrder',validateOrderFields,  registerOrder);
-router.post('/getExpenses', getExpenses.getExpenses);
-router.post('/add_expenses', validateExpenses, addExpenses);
+// router.post('/loginHairDresser', validateLoginHairDresser, loginHairDresser); // DISABLED - Use /login instead
+router.post('/register_user', validateUser, registerUser);
+
+// ==========================================
+// PROTECTED ROUTES (Authentication Required)
+// ==========================================
+
+// User Management
+router.get('/users', authenticateToken, getUsers.getAllUsers);
+router.post('/getUserById', authenticateToken, getUserById.getUserById);
+router.post('/getUserByCompanyId', authenticateToken, getUserByCompanyId.getUserByCompanyId);
+router.post('/getAllCustomers', authenticateToken, getCustomers.getCustomers);
+router.post('/getAllCustomersCount', authenticateToken, getCustomersCount.getCustomersCount);
+router.post('/edit_user', authenticateToken, validateEditingUser, editUser);
+router.post('/deleteUserById', authenticateToken, deleteUserById.deleteUsersById);
+
+// Roles & Permissions
+router.post('/getPermission', authenticateToken, getPermissions.getPermissions);
+router.get('/getRoles', authenticateToken, getAllRoles.getRoles);
+router.post('/updateRoles', authenticateToken, updatePermissions.updatePermission);
+router.post('/getRolesById', authenticateToken, getRolesById.getRolesById);
+router.post('/getAllRoles', authenticateToken, getRoles.getRoles);
+router.post('/register_role', authenticateToken, validateRole, registerRole);
+router.post('/edit_role', authenticateToken, validateEditRole, editRole);
+router.post('/deleteRole', authenticateToken, deleteRoles.deleteRole);
+
+// Branch Management
+router.post('/getBranch', authenticateToken, getBranches.getBranch);
+router.post('/register_branch', authenticateToken, validateBranch, registerBranch);
+router.post('/edit_branch', authenticateToken, validateEditBranch, editBranch);
+router.post('/delete_branch', authenticateToken, deleteBranches.deleteBranch);
+
+// Supplier Management
+router.post('/suppliers', authenticateToken, getSuppliers.getSupplier);
+router.post('/register_supplier', authenticateToken, validateSupplier, registerSupplier);
+router.post('/edit_supplier', authenticateToken, validateEditingSupplier, editSupplier);
+router.post('/deleteSupplier', authenticateToken, deleteSuppliers.deleteSupplier);
+
+// Inventory & Products
+router.post('/products', authenticateToken, getProduct.getProducts);
+router.post('/register_product', authenticateToken, validateProduct, registerProduct);
+router.post('/edit_product', authenticateToken, validateEditProduct, edit_product);
+router.post('/delete_product', authenticateToken, deleteProducts.deleteProduct);
+router.post('/get_purchases', authenticateToken, getPurchases.getPurchase);
+
+// Tax
+router.post('/tax', authenticateToken, tax.getTax);
+
+// Hairdresser Management
+router.post('/getHairDresser', authenticateToken, getAllHairDresser.getHairDressers);
+router.post('/getHairDresserById', authenticateToken, getAllHairDresserByIds.getHairDressersById);
+router.post('/register_hairdresser', authenticateToken, validateHairdresser, registerHairDresser);
+router.post('/edit_hairDresser', authenticateToken, validateEditHairDresser, editHairDresser);
+router.post('/deleteHairDresser', authenticateToken, deleteHairDresser.deleteHairDresser);
+router.post('/post_hairDresser', authenticateToken, validateHairdressers, postHairDresser);
+router.post('/disable_hairdressing', authenticateToken, disableHairDressing.disableHairdressing);
+
+// Hairdressing (Services Assignment)
+router.post('/getHairDressing', authenticateToken, getHairDressings.getHairDressing);
+router.post('/getHairDressing2', authenticateToken, getHairDressings2.getHairDressing2);
+router.post('/updateHairDressingStatus', authenticateToken, updatesHairDressing.updateHairDressing);
+router.post('/delete_hairdresser_hairstyling', authenticateToken, delete_hairdresser_hairstyling.delete_hairdresser_hairstyling);
+
+// Hairstyles (Services/Products)
+router.post('/getHairStyle', authenticateToken, getAllHairStyle.getMisukoById);
+router.post('/getAllHairStyle', authenticateToken, getAllHairStyles.getMisuko);
+router.post('/register_hairStyle', authenticateToken, validateHairStyle, registerHairStyle);
+router.post('/edit_hairStyle', authenticateToken, validateEditMsuko, editMsuko);
+router.post('/deleteHairStyle', authenticateToken, deleteHairStyles.deleteMisuko);
+
+// Orders & Transactions
+router.post('/addOrder', authenticateToken, validateOrderFields, registerOrder);
+router.post('/getOrders', authenticateToken, getAllOrders.getOrders);
+router.post('/getOrdersByRange', authenticateToken, getAllOrdersByRange.getOrdersByRange);
+router.post('/reconciliation', authenticateToken, performReconciliation.reconciliation);
+
+// Expenses
+router.post('/getExpenses', authenticateToken, getExpenses.getExpenses);
+router.post('/getExpensesByRange', authenticateToken, getExpensesByRange.getExpensesByRange);
+router.post('/getExpensesType', authenticateToken, getExpensesType.getExpensesType);
+router.post('/registerExpenseType', authenticateToken, validateExpenseType, registerExpenseType);
+router.post('/add_expenses', authenticateToken, validateExpenses, addExpenses);
+router.post('/deleteExpenses', authenticateToken, deleteExpenses.deleteExpenses);
+
+// Payroll & Reports
+router.post('/getPayroll', authenticateToken, getPayrolls.payroll);
+
+// Shift Management
+router.post('/getActiveShift', authenticateToken, shiftController.getActive);
+router.post('/endShift', authenticateToken, shiftController.endCurrentShift);
+router.post('/getShiftSummary', authenticateToken, shiftController.getShiftSummary);
+router.post('/startShift', authenticateToken, shiftController.startShift);
 
 module.exports = router;
