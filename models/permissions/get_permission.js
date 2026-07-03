@@ -13,7 +13,7 @@ const getPermissions = async (req, res) => {
       }
 
       if (results.length === 0) {
-        return res.status(400).json({ message: 'Permissions not found' });
+        return res.status(200).json({ message: 'No permissions configured', contents: [] });
       }
       const permissionsWithSubmenus = [];
 

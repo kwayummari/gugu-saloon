@@ -47,7 +47,7 @@ const registerHairDresser = async (req, res) => {
                             }
 
                             if (hairStyles.length === 0) {
-                                return res.status(404).json({ message: 'No hairstyles found' });
+                                return res.status(200).json({ message: 'No hairstyles found' });
                             }
 
                             // Create bulk insert values for hairDressing table

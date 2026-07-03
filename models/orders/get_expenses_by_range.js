@@ -22,7 +22,7 @@ const getExpensesByRange = async (req, res) => {
 
       if (results.length === 0) {
         console.log('⚠️ No expenses found for given criteria.');
-        return res.status(404).json({ message: 'No expenses found' });
+        return res.status(200).json({ message: 'No expenses found' });
       }
 
       res.status(200).json({

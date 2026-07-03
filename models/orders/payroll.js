@@ -26,7 +26,7 @@ const payroll = async (req, res) => {
 
       if (results.length === 0) {
         console.log('⚠️ No payroll data found for date:', todayDate);
-        return res.status(404).json({ message: 'No Payroll found' });
+        return res.status(200).json({ message: 'No Payroll found' });
       }
 
       console.log('✅ Payroll fetched:', results.length, 'hairdressers');

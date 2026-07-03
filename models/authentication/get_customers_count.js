@@ -35,7 +35,7 @@ const getCustomersCount = async (req, res) => {
     // Checking if there are no results and returning a 404 response
     if (!results || results.length === 0) {
       console.warn('No customers found for the given parameters.');
-      return res.status(404).json({ message: 'No customers found' });
+      return res.status(200).json({ message: 'No customers found' });
     }
 
     // Extracting the total customer count from the results

@@ -26,7 +26,16 @@ const getOrdersByRange = async (req, res) => {
     );
 
     if (results.length === 0) {
-      return res.status(404).json({ message: 'No orders found' });
+      return res.status(200).json({
+        message: 'No orders found for the selected range',
+        orders: [],
+        overallTotalOfficeAmount: 0,
+        overallTotalVishanga: 0,
+        overallTotalCostOfHair: 0,
+        overallTotalHairDresserAmount: 0,
+        overallTotalAmountPaid: 0,
+        actualExpenses: 0,
+      });
     }
 
     let overallTotalOfficeAmount = 0;

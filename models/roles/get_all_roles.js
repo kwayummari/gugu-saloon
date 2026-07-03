@@ -12,7 +12,7 @@ const getRoles = async (req, res) => {
       }
 
       if (results.length === 0) {
-        return res.status(404).json({ message: 'No roles found' });
+        return res.status(200).json({ message: 'No roles found' });
       }
 
       res.status(200).json({ message: 'Roles fetched successfully', roles: results });

@@ -13,7 +13,7 @@ const getPurchase = async (req, res) => {
       }
 
       if (orderResults.length === 0) {
-        return res.status(404).json({ message: 'You do not have orders' });
+        return res.status(200).json({ message: 'You do not have orders' });
       }
 
       // Fetch branch details for each order
