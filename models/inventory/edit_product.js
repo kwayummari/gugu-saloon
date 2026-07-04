@@ -25,13 +25,13 @@ const edit_product = async (req, res) => {
         const connectionPool = await connectionPoolWithRetry();
 
         connectionPool.query(
-            queries.check_inventory_existence,
-            [name, branchId, companyId],
+            queries.check_inventory_existence_for_deleting,
+            [id],
             (error, result) => {
                 if (error) {
                     return res.status(500).json({ message: error.message });
                 }
-                if (result.length = 0) {
+                if (result.length === 0) {
                     return res.status(400).json({ message: "Product doesn't exists" });
                 }
                 connectionPool.query(

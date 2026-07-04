@@ -5,6 +5,31 @@ const queries = require('../../database/queries');
 const xss = require('xss');
 const { sendSMS, sendOrderConfirmation } = require('../../services/smsService');
 const { getActiveShift } = require('../../services/shiftService');
+const { getAdminPhone } = require('../settings/admin_settings');
+
+const DEFAULT_SMS_ALERT_TEMPLATE = `NEW ORDER ALERT
+
+Receipt: {receipt}
+Customer: {customer}
+Service: {service}
+Amount: {amount} Tsh
+Hairdresser: {hairdresser}
+Branch: {branchName}
+Time: {time}
+
+TODAY'S TOTALS:
+Orders: {orderCount}
+Revenue: {revenue} Tsh
+Office Amount: {office} Tsh
+Hairdresser Amount: {hairdresserAmount} Tsh
+Expenses: {expenses} Tsh
+
+NET PROFIT: {netProfit} Tsh
+
+- Gugu Beauty Saloon`;
+
+const renderTemplate = (template, data) =>
+    template.replace(/{(\w+)}/g, (match, key) => (Object.prototype.hasOwnProperty.call(data, key) ? data[key] : match));
 
 // Validator functions for each field
 const validateOrderFields = [
@@ -83,13 +108,17 @@ const registerOrder = async (req, res) => {
                 const hairStyleName = hairStyleResult && hairStyleResult.length > 0 ? hairStyleResult[0].name : 'Unknown';
                 const hairdresserName = hairdresserResult && hairdresserResult.length > 0 ? hairdresserResult[0].name : 'Unknown';
 
-                // Get branch name
-                connectionPool.query('SELECT name FROM branch WHERE id = ?', [branchId], (error, branchResult) => {
+                // Get branch name + SMS alert settings
+                connectionPool.query(queries.getBranchSmsAlertSettings, [branchId], (error, branchResult) => {
                     if (error) {
                         console.error('Error fetching branch:', error);
                     }
 
-                    const branchName = branchResult && branchResult.length > 0 ? branchResult[0].name : 'Unknown Branch';
+                    const branchRow = branchResult && branchResult.length > 0 ? branchResult[0] : null;
+                    const branchName = branchRow ? branchRow.name : 'Unknown Branch';
+                    const smsAlertIntervalMinutes = branchRow ? branchRow.sms_alert_interval_minutes : 60;
+                    const smsAlertTemplate = branchRow ? branchRow.sms_alert_template : null;
+                    const smsAlertLastSentAt = branchRow ? branchRow.sms_alert_last_sent_at : null;
 
                     // Get hairstyle amount for this order
                     connectionPool.query('SELECT amount FROM hairStyle WHERE id = ?', [hairStyleId], (error, amountResult) => {
@@ -174,24 +203,55 @@ const registerOrder = async (req, res) => {
                                                 const netProfit = newTotalOfficeAmount - todayTotalExpenses;
                                                 const formattedNetProfit = formatAmount(netProfit);
 
-                                                // Build balance update message with full breakdown
-                                                const balanceUpdate = `\n\nPREVIOUS BALANCE:\nOrders: ${previousOrderCount}\nRevenue: ${formattedPreviousAmount} Tsh\nOffice: ${formattedPreviousOffice} Tsh\n\nCURRENT BALANCE:\nOrders: ${newOrderCount}\nRevenue: ${formattedNewAmount} Tsh\nOffice Amount: ${formattedNewOffice} Tsh\nHairdresser Amount: ${formattedNewHairdresser} Tsh\nExpenses: ${formattedExpenses} Tsh\n\nNET PROFIT: ${formattedNetProfit} Tsh\n(Office Amount - Expenses)`;
+                                                // Decide whether the admin order-alert SMS is due (per-branch throttle)
+                                                const minutesSinceLastSent = smsAlertLastSentAt
+                                                    ? (Date.now() - new Date(smsAlertLastSentAt).getTime()) / 60000
+                                                    : null;
+                                                const alertIsDue = minutesSinceLastSent === null || minutesSinceLastSent >= smsAlertIntervalMinutes;
 
-                                                // Send SMS notification to admin (async, don't wait)
-                                                const smsMessage = `NEW ORDER ALERT\n\nReceipt: ${randomNumber}\nCustomer: ${sanitizedName}\nPhone: ${sanitizedPhone}\nService: ${hairStyleName}\nAmount: ${formattedOrderAmount} Tsh\nHairdresser: ${hairdresserName}\nBranch: ${branchName}\nTime: ${orderTime}${balanceUpdate}\n\n- Gugu Beauty Saloon`;
+                                                if (alertIsDue) {
+                                                    const templateData = {
+                                                        receipt: randomNumber,
+                                                        customer: sanitizedName,
+                                                        phone: sanitizedPhone,
+                                                        service: hairStyleName,
+                                                        amount: formattedOrderAmount,
+                                                        hairdresser: hairdresserName,
+                                                        branchName: branchName,
+                                                        time: orderTime,
+                                                        orderCount: newOrderCount,
+                                                        revenue: formattedNewAmount,
+                                                        office: formattedNewOffice,
+                                                        hairdresserAmount: formattedNewHairdresser,
+                                                        expenses: formattedExpenses,
+                                                        netProfit: formattedNetProfit,
+                                                    };
+                                                    const smsMessage = renderTemplate(
+                                                        smsAlertTemplate || DEFAULT_SMS_ALERT_TEMPLATE,
+                                                        templateData
+                                                    );
 
-                                                // Send SMS to admin
-                                                sendSMS(process.env.ADMIN_PHONE, smsMessage)
-                                                    .then((smsResult) => {
-                                                        if (smsResult.success) {
-                                                            console.log('✅ Admin notified of new order via SMS');
-                                                        } else {
-                                                            console.error('❌ Failed to send admin SMS:', smsResult.error);
-                                                        }
-                                                    })
-                                                    .catch((err) => {
-                                                        console.error('❌ Admin SMS notification error:', err.message);
-                                                    });
+                                                    // Send SMS to admin (async, don't wait)
+                                                    getAdminPhone()
+                                                        .then((adminPhone) => sendSMS(adminPhone, smsMessage))
+                                                        .then((smsResult) => {
+                                                            if (smsResult.success) {
+                                                                console.log('✅ Admin notified of new order via SMS');
+                                                                connectionPool.query(
+                                                                    queries.updateBranchSmsAlertLastSent,
+                                                                    [new Date(), branchId],
+                                                                    () => {}
+                                                                );
+                                                            } else {
+                                                                console.error('❌ Failed to send admin SMS:', smsResult.error);
+                                                            }
+                                                        })
+                                                        .catch((err) => {
+                                                            console.error('❌ Admin SMS notification error:', err.message);
+                                                        });
+                                                } else {
+                                                    console.log(`⏱️ Admin order-alert SMS throttled for branch ${branchId} — next eligible in ${(smsAlertIntervalMinutes - minutesSinceLastSent).toFixed(1)} min`);
+                                                }
 
                                                 // Send SMS confirmation to customer
                                                 sendOrderConfirmation(

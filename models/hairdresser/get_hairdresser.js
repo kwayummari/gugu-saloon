@@ -11,7 +11,7 @@ const getHairDressers = async (req, res) => {
         return res.status(500).json({ message: 'Internal Server Error' });
       }
       if (hairDresserResults.length === 0) {
-        return res.status(200).json({ message: 'No hairdresser found' });
+        return res.status(200).json({ message: 'No hairdresser found', hairDressers: [] });
       }
 
       const hairDressersWithHairDressing = await Promise.all(hairDresserResults.map(async (hairDresser) => {

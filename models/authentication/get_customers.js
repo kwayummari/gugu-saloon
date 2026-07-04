@@ -11,7 +11,7 @@ const getCustomers = async (req, res) => {
         return res.status(500).json({ message: 'Internal Server Error' });
       }
       if (results.length === 0) {
-        return res.status(200).json({ message: 'Customers not found' });
+        return res.status(200).json({ message: 'Customers not found', customers: [] });
       }
 
       res.status(200).json({ message: 'Customers fetched successfully', customers: results });

@@ -29,6 +29,8 @@ const deleteExpenses = require('../models/orders/delete_expenses_type');
 const { validateBranch, registerBranch } = require('../models/branch/add_branch');
 const { validateEditBranch, editBranch } = require('../models/branch/edit_branch');
 const deleteBranches = require('../models/branch/delete_branch');
+const smsAlertSettings = require('../models/branch/sms_alert_settings');
+const adminSettings = require('../models/settings/admin_settings');
 const getSuppliers = require('../models/supplier/get_suppliers');
 const { validateSupplier, registerSupplier } = require('../models/supplier/add_supplier');
 const deleteSuppliers = require('../models/supplier/delete_supplier');
@@ -97,6 +99,10 @@ router.post('/getBranch', authenticateToken, getBranches.getBranch);
 router.post('/register_branch', authenticateToken, validateBranch, registerBranch);
 router.post('/edit_branch', authenticateToken, validateEditBranch, editBranch);
 router.post('/delete_branch', authenticateToken, deleteBranches.deleteBranch);
+router.post('/getBranchSmsAlertSettings', authenticateToken, smsAlertSettings.getSmsAlertSettings);
+router.post('/updateBranchSmsAlertSettings', authenticateToken, smsAlertSettings.validateSmsAlertSettings, smsAlertSettings.updateSmsAlertSettings);
+router.post('/getAdminSettings', authenticateToken, adminSettings.getAdminSettings);
+router.post('/updateAdminSettings', authenticateToken, adminSettings.validateAdminSettings, adminSettings.updateAdminSettings);
 
 // Supplier Management
 router.post('/suppliers', authenticateToken, getSuppliers.getSupplier);

@@ -6,7 +6,6 @@ const updateHairDressing = async (req, res) => {
         const connectionPool = await connectionPoolWithRetry();
 
         const { id, status } = req.body;
-        console.log(id, status)
         connectionPool.query(
             queries.update_hairdressing,
             [ status, id ],
@@ -14,10 +13,10 @@ const updateHairDressing = async (req, res) => {
                 if (error) {
                     return res.status(500).json({ message: error.message });
                 }
-                if (result.length = 0) {
+                if (result.affectedRows === 0) {
                     return res.status(400).json({ message: "Hair dresser not available" });
                 }
-                res.status(200).json({ message: status === '1' ? 'Hair dresser enabled successfully' : 'Hair dresser disabled successfully' });
+                res.status(200).json({ message: Number(status) === 1 ? 'Hair dresser enabled successfully' : 'Hair dresser disabled successfully' });
             }
         );
     } catch (err) {

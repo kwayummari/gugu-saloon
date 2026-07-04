@@ -1,5 +1,6 @@
 const axios = require('axios');
 const dotenv = require('dotenv');
+const { getAdminPhone } = require('../models/settings/admin_settings');
 
 dotenv.config();
 
@@ -7,7 +8,6 @@ const BEEM_API_KEY = process.env.BEEM_API_KEY;
 const BEEM_SECRET_KEY = process.env.BEEM_SECRET_KEY;
 const BEEM_SENDER_ID = process.env.BEEM_SENDER_ID || 'GUGU';
 const BEEM_API_URL = process.env.BEEM_API_URL || 'https://apisms.beem.africa/v1/send';
-const ADMIN_PHONE = process.env.ADMIN_PHONE || '0762996305';
 
 /**
  * Send SMS via Beem Africa API
@@ -86,7 +86,8 @@ const sendSMS = async (phoneNumber, message) => {
 const sendLoginNotification = async (userName, loginTime, userType = 'hairdresser') => {
     const message = `GUGU LOGIN ALERT\n\nUser: ${userName}\nType: ${userType}\nTime: ${loginTime}\n\n- Gugu Beauty Saloon`;
 
-    return await sendSMS(ADMIN_PHONE, message);
+    const adminPhone = await getAdminPhone();
+    return await sendSMS(adminPhone, message);
 };
 
 /**

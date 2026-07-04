@@ -20,12 +20,12 @@ const editHairDresser = async (req, res) => {
 
         connectionPool.query(
             queries.check_edit_hairdresser_existence,
-            [name, id],
+            [id],
             (error, result) => {
                 if (error) {
                     return res.status(500).json({ message: error.message });
                 }
-                if (result.length = 0) {
+                if (result.length === 0) {
                     return res.status(400).json({ message: "Hair dresser doesn't exists" });
                 }
                 connectionPool.query(

@@ -11,7 +11,7 @@ const getTax = async (req, res) => {
       }
 
       if (results.length === 0) {
-        return res.status(200).json({ message: 'No Tax Type found' });
+        return res.status(200).json({ message: 'No Tax Type found', tax: [] });
       }
 
       res.status(200).json({ message: 'Tax Type fetched successfully', tax: results });

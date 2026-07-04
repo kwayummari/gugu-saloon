@@ -1,6 +1,7 @@
 const connectionPoolWithRetry = require('../database/db_connection');
 const queries = require('../database/queries');
 const { sendSMS } = require('./smsService');
+const { getAdminPhone } = require('../models/settings/admin_settings');
 
 /**
  * Determine shift type based on current time and branch configuration
@@ -185,7 +186,8 @@ const endShift = async (shiftId) => {
 
         const smsMessage = `SHIFT ENDED - ${shift.shift_type.toUpperCase()}\n\nManager: ${shift.manager_name}\nDuration: ${hours}h ${minutes}m\nEnded: ${shiftEndTime}\n\nSUMMARY:\nOrders: ${stats.orderCount}\nRevenue: ${formatAmount(stats.totalRevenue)} Tsh\nHairdressers: ${formatAmount(stats.totalHairDresserAmount)} Tsh\nOffice: ${formatAmount(stats.totalOfficeAmount)} Tsh\nExpenses: ${formatAmount(totalExpenses)} Tsh\nNet Profit: ${formatAmount(netProfit)} Tsh\n\n- Gugu Beauty Saloon`;
 
-        sendSMS(process.env.ADMIN_PHONE, smsMessage)
+        getAdminPhone()
+            .then((adminPhone) => sendSMS(adminPhone, smsMessage))
             .then((result) => {
                 if (result.success) {
                     console.log('✅ Shift end notification sent via SMS');

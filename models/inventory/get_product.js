@@ -12,7 +12,7 @@ const getProducts = async (req, res) => {
       }
 
       if (productResults.length === 0) {
-        return res.status(200).json({ message: 'You do not have products' });
+        return res.status(200).json({ message: 'You do not have products', products: [] });
       }
       const productWithBranch = await Promise.all(productResults.map(async product => {
         return new Promise((resolve, reject) => {

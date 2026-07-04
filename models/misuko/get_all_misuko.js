@@ -12,7 +12,7 @@ const getMisuko = async (req, res) => {
       }
 
       if (results.length === 0) {
-        return res.status(200).json({ message: 'No hair styles found' });
+        return res.status(200).json({ message: 'No hair styles found', hairStyle: [] });
       }
 
       res.status(200).json({ message: 'Hair style fetched successfully', hairStyle: results });

@@ -4,6 +4,7 @@ const queries = require('../../database/queries');
 const util = require('util');
 const { getActiveShift } = require('../../services/shiftService');
 const { sendSMS } = require('../../services/smsService');
+const { getAdminPhone } = require('../settings/admin_settings');
 
 const validateExpenses = [
     body('valueHolder').trim().notEmpty().withMessage('Please select expense type'),
@@ -126,7 +127,8 @@ const addExpenses = async (req, res) => {
         const smsMessage = `NEW EXPENSE ALERT\n\nType: ${expenseTypeName}\nAmount: ${formattedAmount} Tsh\nDescription: ${description}\nBranch: ${branchName}\nCreated by: ${managerName}\nTime: ${expenseTime}${balanceUpdate}\n\n- Gugu Beauty Saloon`;
 
         // Send SMS to admin (async, don't wait)
-        sendSMS(process.env.ADMIN_PHONE, smsMessage)
+        getAdminPhone()
+            .then((adminPhone) => sendSMS(adminPhone, smsMessage))
             .then((smsResult) => {
                 if (smsResult.success) {
                     console.log('✅ Admin notified of new expense via SMS');

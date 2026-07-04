@@ -45,7 +45,17 @@ const getOrders = async (req, res) => {
       }
 
       if (results.length === 0) {
-        return res.status(200).json({ message: 'No orders were recorded in the given date range' });
+        return res.status(200).json({
+          message: 'No orders were recorded in the given date range',
+          overallTotalOfficeAmount: 0,
+          overallTotalVishanga: 0,
+          overallTotalCostOfHair: 0,
+          overallTotalHairDresserAmount: 0,
+          overallTotalExpenses: 0,
+          actualTotalProfit: 0,
+          overallTotalAmountPaid: 0,
+          orders: [],
+        });
       }
 
       let overallTotalOfficeAmount = 0;

@@ -27,13 +27,13 @@ WHERE DATE(date) BETWEEN ? AND ?
   getAllCustomers: `WITH RankedOrders AS (
     SELECT
         o.name AS orderName,
-        o.date,
+        MAX(o.date) AS date,
         o.hairStyleId,
         o.phone,
         ROW_NUMBER() OVER (
             PARTITION BY o.name
             ORDER BY COUNT(o.hairStyleId) DESC
-        ) AS rank
+        ) AS orderRank
     FROM
         orders o
     WHERE
@@ -52,7 +52,7 @@ MostFrequentHairStyle AS (
     FROM
         RankedOrders ro
     WHERE
-        ro.rank = 1
+        ro.orderRank = 1
 )
 SELECT
     mf.orderName,
@@ -146,7 +146,7 @@ JOIN
   check_hairdresser_existence:
     "SELECT * FROM hairdresser WHERE name = ? AND branchId = ? AND companyId = ? LIMIT 1",
   check_edit_hairdresser_existence:
-    "SELECT * FROM hairdresser WHERE name = ? AND id = ? LIMIT 1",
+    "SELECT * FROM hairdresser WHERE id = ? LIMIT 1",
   check_delete_hairdresser_existence:
     "SELECT * FROM hairdresser WHERE id = ? LIMIT 1",
   update_hairdressing: "UPDATE hairDressing SET status = ? WHERE id = ?",
@@ -467,6 +467,19 @@ AND DATE(expenses.date) = CURDATE();
 
   // Shift Management Queries
   getBranchShiftConfig: "SELECT has_shifts, shift_config FROM branch WHERE id = ?",
+
+  // SMS Alert Settings Queries
+  getBranchSmsAlertSettings:
+    "SELECT name, sms_alert_interval_minutes, sms_alert_template, sms_alert_last_sent_at FROM branch WHERE id = ?",
+  updateBranchSmsAlertSettings:
+    "UPDATE branch SET sms_alert_interval_minutes = ?, sms_alert_template = ? WHERE id = ?",
+  updateBranchSmsAlertLastSent:
+    "UPDATE branch SET sms_alert_last_sent_at = ? WHERE id = ?",
+
+  // Admin Settings Queries
+  getAdminSettings: "SELECT admin_phone FROM company_settings WHERE id = 1",
+  upsertAdminSettings:
+    "INSERT INTO company_settings (id, admin_phone) VALUES (1, ?) ON DUPLICATE KEY UPDATE admin_phone = VALUES(admin_phone)",
 
   getActiveShift: `SELECT * FROM shifts 
     WHERE branch_id = ? AND status = 'active' 

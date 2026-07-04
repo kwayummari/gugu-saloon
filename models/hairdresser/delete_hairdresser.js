@@ -13,7 +13,7 @@ const deleteHairDresser = async (req, res) => {
                 if (error) {
                     return res.status(500).json({ message: error.message });
                 }
-                if (result.length = 0) {
+                if (result.length === 0) {
                     return res.status(400).json({ message: "Hair dresser not available" });
                 }
                 connectionPool.query(queries.delete_Hairdresser, [id], (error, results) => {
