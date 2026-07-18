@@ -14,13 +14,17 @@ const getOrdersByRange = async (req, res) => {
     // Using the promise API from mysql2
     const connectionPool = await connectionPoolWithRetry();
 
+    // Day tab also includes 'full_day' shifts (branches without a day/night split);
+    // Night tab only matches real night shifts.
+    const shiftTypes = Number(orderStatus) === 1 ? ['day', 'full_day'] : ['night'];
+
     // Replace the callback query with a promise-based query
     const [results] = await connectionPool.promise().query(
       queries.getOrdersByRange,
       [
-        companyId, branchId, orderStatus, startDate, endDate, // For HairDresserAggregates
-        companyId, branchId, orderStatus, startDate, endDate, // For OrderDetails
-        companyId, branchId, orderStatus, startDate, endDate, // For TotalOfficeAmount
+        companyId, branchId, shiftTypes, startDate, endDate, // For HairDresserAggregates
+        companyId, branchId, shiftTypes, startDate, endDate, // For OrderDetails
+        companyId, branchId, shiftTypes, startDate, endDate, // For TotalOfficeAmount
         companyId, branchId, startDate, endDate // For ExpensesTotal (no status column in expenses table)
       ]
     );

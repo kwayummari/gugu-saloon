@@ -14,21 +14,25 @@ const getOrders = async (req, res) => {
   try {
     const connectionPool = await connectionPoolWithRetry();
 
+    // Day tab also includes 'full_day' shifts (branches without a day/night split);
+    // Night tab only matches real night shifts.
+    const shiftTypes = Number(orderStatus) === 1 ? ['day', 'full_day'] : ['night'];
+
     // Prepare the query parameters
     const queryParams = [
       companyId,
       branchId,
-      orderStatus,
+      shiftTypes,
       startDate, // Start date for the SQL query
       endDate,   // End date for the SQL query
       companyId,
       branchId,
-      orderStatus,
+      shiftTypes,
       startDate, // Start date for HairDresserAggregates
       endDate,   // End date for HairDresserAggregates
       companyId,
       branchId,
-      orderStatus,
+      shiftTypes,
       startDate, // Start date for TotalOfficeAmount
       endDate,   // End date for TotalOfficeAmount
       companyId,

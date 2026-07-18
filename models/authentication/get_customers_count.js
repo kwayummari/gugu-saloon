@@ -23,10 +23,14 @@ const getCustomersCount = async (req, res) => {
     const connectionPool = await connectionPoolWithRetry();
     console.log('Connected to MySQL database.');
 
+    // Day tab also includes 'full_day' shifts (branches without a day/night split);
+    // Night tab only matches real night shifts.
+    const shiftTypes = Number(orderStatus) === 1 ? ['day', 'full_day'] : ['night'];
+
     // Using promise-based query for better async handling
     const [results] = await connectionPool.promise().query(
       queries.getAllCustomersCount,
-      [startDate, endDate, companyId, branchId, orderStatus] // Pass parameters in the correct order
+      [startDate, endDate, companyId, branchId, shiftTypes] // Pass parameters in the correct order
     );
 
     console.log('Query executed successfully.');

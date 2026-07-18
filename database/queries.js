@@ -17,11 +17,12 @@ WHERE user.role != 1 AND user.companyId = '1';
 `,
   getAllCustomersCount: `
 SELECT COUNT(*) AS customerCount
-FROM orders
-WHERE DATE(date) BETWEEN ? AND ?
-  AND companyId = ?
-  AND branchId = ?
-  AND \`status\` = ?
+FROM orders o
+LEFT JOIN shifts sh ON o.shift_id = sh.id
+WHERE DATE(o.date) BETWEEN ? AND ?
+  AND o.companyId = ?
+  AND o.branchId = ?
+  AND COALESCE(sh.shift_type, 'full_day') IN (?)
 `,
 
   getAllCustomers: `WITH RankedOrders AS (
@@ -86,7 +87,7 @@ JOIN
   getSubmenu: "SELECT * FROM submenu WHERE menuId = ?",
   getRoles: "SELECT * FROM roles WHERE companyId = ?",
   getRolesById: "SELECT * FROM roles WHERE id = ?",
-  getBranch: "SELECT * FROM branch WHERE companyId = ?",
+  getBranch: "SELECT * FROM branch WHERE companyId = ? AND is_active = TRUE",
   check_role_existence:
     "SELECT * FROM roles WHERE name = ? AND companyId = ? LIMIT 1",
   edit_role: "UPDATE roles SET name = ? WHERE id = ?",
@@ -174,12 +175,12 @@ JOIN
     "SELECT * FROM hairStyle WHERE name = ? AND id = ? LIMIT 1",
   edit_Hairstyle: `UPDATE hairStyle SET name = ?, amount = ?, description = ?, officeAmount = ?, hairDresserAmount = ?, costOfHair = ?, vishanga = ?, remainderAmount = ?, branchId = ? WHERE id = ?`,
   getHairStyles: "SELECT * FROM hairStyle WHERE companyId = ? AND branchId = ?",
-  getPayroll: `SELECT 
+  getPayroll: `SELECT
     o.hairDresserId,
     o.date,
-    h.name AS hairDresserName, 
-    SUM(hs.hairDresserAmount) AS totalHairDresserAmount
-    FROM 
+    h.name AS hairDresserName,
+    CAST(SUM(hs.hairDresserAmount) AS UNSIGNED) AS totalHairDresserAmount
+    FROM
         orders o
     JOIN 
         hairdresser h ON o.hairDresserId = h.id
@@ -222,10 +223,12 @@ JOIN
         orders o
     JOIN
         hairStyle hs ON o.hairstyleId = hs.id
+    LEFT JOIN
+        shifts sh ON o.shift_id = sh.id
     WHERE
         o.companyId = ?
         AND o.branchId = ?
-        AND o.status = ?  -- Condition for orderStatus
+        AND COALESCE(sh.shift_type, 'full_day') IN (?)  -- Condition for orderStatus
         AND DATE(o.date) BETWEEN ? AND ?  -- Use startDate and endDate
     GROUP BY
         o.receiptNumber, o.hairDresserId, o.name, o.date, hs.HairDresserAmount,
@@ -243,10 +246,12 @@ HairDresserAggregates AS (
         hairStyle hs ON o.hairstyleId = hs.id
     JOIN
         hairdresser hd ON o.hairDresserId = hd.id
+    LEFT JOIN
+        shifts sh ON o.shift_id = sh.id
     WHERE
         o.companyId = ?
         AND o.branchId = ?
-        AND o.status = ?  -- Condition for orderStatus
+        AND COALESCE(sh.shift_type, 'full_day') IN (?)  -- Condition for orderStatus
         AND DATE(o.date) BETWEEN ? AND ?  -- Use startDate and endDate
     GROUP BY
         hd.id, hd.name
@@ -262,10 +267,12 @@ TotalOfficeAmount AS (
         orders o
     JOIN
         hairStyle hs ON o.hairstyleId = hs.id
+    LEFT JOIN
+        shifts sh ON o.shift_id = sh.id
     WHERE
         o.companyId = ?
         AND o.branchId = ?
-        AND o.status = ?  -- Condition for orderStatus
+        AND COALESCE(sh.shift_type, 'full_day') IN (?)  -- Condition for orderStatus
         AND DATE(o.date) BETWEEN ? AND ?  -- Use startDate and endDate
 ),
 TotalExpenses AS (
@@ -320,54 +327,60 @@ ORDER BY
         hs.description,
         hs.costOfHair,
         hs.vishanga
-    FROM 
+    FROM
         orders o
-    JOIN 
+    JOIN
         hairStyle hs ON o.hairstyleId = hs.id
-    WHERE 
-        o.companyId = ? 
+    LEFT JOIN
+        shifts sh ON o.shift_id = sh.id
+    WHERE
+        o.companyId = ?
         AND o.branchId = ?
-        AND o.status = ?
+        AND COALESCE(sh.shift_type, 'full_day') IN (?)
         AND o.date BETWEEN ? AND ?
-    GROUP BY 
-        o.receiptNumber, o.hairDresserId, o.name, o.date, hs.hairDresserAmount, 
+    GROUP BY
+        o.receiptNumber, o.hairDresserId, o.name, o.date, hs.hairDresserAmount,
         hs.officeAmount, hs.description, hs.costOfHair, hs.vishanga
 ),
 HairDresserAggregates AS (
-    SELECT 
+    SELECT
         hd.id AS hairDresserId,
         hd.name AS hairDresserName,
         SUM(hs.hairDresserAmount) AS totalHairDresserAmount,
         SUM(hs.officeAmount) AS totalOfficeAmount
-    FROM 
+    FROM
         orders o
-    JOIN 
+    JOIN
         hairStyle hs ON o.hairstyleId = hs.id
-    JOIN 
+    JOIN
         hairdresser hd ON o.hairDresserId = hd.id
-    WHERE 
-        o.companyId = ? 
+    LEFT JOIN
+        shifts sh ON o.shift_id = sh.id
+    WHERE
+        o.companyId = ?
         AND o.branchId = ?
-        AND o.status = ? 
+        AND COALESCE(sh.shift_type, 'full_day') IN (?)
         AND o.date BETWEEN ? AND ?
-    GROUP BY 
+    GROUP BY
         hd.id, hd.name
 ),
 TotalOfficeAmount AS (
-    SELECT 
+    SELECT
         SUM(hs.officeAmount) AS overallTotalOfficeAmount,
         SUM(hs.hairDresserAmount) AS overallTotalHairDresserAmount,
         SUM(hs.costOfHair) AS overallTotalCostOfHair,
         SUM(hs.vishanga) AS overallTotalVishanga,
         SUM(hs.amount) AS overallTotalAmountPaid
-    FROM 
+    FROM
         orders o
-    JOIN 
+    JOIN
         hairStyle hs ON o.hairstyleId = hs.id
-    WHERE 
-        o.companyId = ? 
+    LEFT JOIN
+        shifts sh ON o.shift_id = sh.id
+    WHERE
+        o.companyId = ?
         AND o.branchId = ?
-        AND o.status = ? 
+        AND COALESCE(sh.shift_type, 'full_day') IN (?)
         AND o.date BETWEEN ? AND ?
 ),
 ExpensesTotal AS (
