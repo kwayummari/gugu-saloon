@@ -33,14 +33,14 @@ const renderTemplate = (template, data) =>
 
 // Validator functions for each field
 const validateOrderFields = [
-    body('name').notEmpty().withMessage('Name is required').trim().escape(),
-    body('phone').notEmpty().withMessage('Phone number is required').isMobilePhone().withMessage('Invalid phone number').trim().escape(),
-    body('hairStyleId').isInt().withMessage('Hair style ID must be an integer').toInt(),
-    body('hairDresserId').isInt().withMessage('Hair dresser ID must be an integer').toInt(),
-    body('randomNumber').isNumeric().withMessage('Random number must be numeric').trim(),
-    body('companyId').isInt().withMessage('Company ID must be an integer').toInt(),
-    body('branchId').isInt().withMessage('Branch ID must be an integer').toInt(),
-    body('managerId').isInt().withMessage('Manager ID must be an integer').toInt()
+    body('name').notEmpty().withMessage('Tafadhali weka jina la mteja').trim().escape(),
+    body('phone').notEmpty().withMessage('Tafadhali weka namba ya simu').isMobilePhone().withMessage('Namba ya simu si sahihi').trim().escape(),
+    body('hairStyleId').isInt().withMessage('Chagua mtindo wa nywele sahihi').toInt(),
+    body('hairDresserId').isInt().withMessage('Chagua mtaalamu wa nywele sahihi').toInt(),
+    body('randomNumber').isNumeric().withMessage('Namba ya risiti lazima iwe namba').trim(),
+    body('companyId').isInt().withMessage('Hitilafu ya taarifa za kampuni').toInt(),
+    body('branchId').isInt().withMessage('Hitilafu ya taarifa za tawi').toInt(),
+    body('managerId').isInt().withMessage('Hitilafu ya taarifa za meneja').toInt()
 ];
 
 const registerOrder = async (req, res) => {
@@ -63,7 +63,7 @@ const registerOrder = async (req, res) => {
         const shiftCheck = await getActiveShift(branchId);
         if (!shiftCheck.success || !shiftCheck.shift) {
             return res.status(403).json({
-                message: 'No active shift. Manager must login to start shift before creating orders.',
+                message: 'Hakuna zamu iliyoanzishwa. Meneja anatakiwa aanzishe zamu kabla ya kuweka oda.',
                 requiresShift: true
             });
         }
@@ -180,7 +180,7 @@ const registerOrder = async (req, res) => {
                                             (error, result) => {
                                                 if (error) {
                                                     console.log(error);
-                                                    return res.status(500).json({ message: error.message });
+                                                    return res.status(500).json({ message: 'Hitilafu ya mfumo, tafadhali jaribu tena baadaye' });
                                                 }
 
                                                 // Helper function to format numbers safely
@@ -273,7 +273,7 @@ const registerOrder = async (req, res) => {
                                                         console.error('❌ Customer SMS notification error:', err.message);
                                                     });
 
-                                                return res.status(200).json({ message: 'Order created successfully', order: result });
+                                                return res.status(200).json({ message: 'Oda imewekwa kikamilifu', order: result });
                                             }
                                         );
                                     }
@@ -287,7 +287,7 @@ const registerOrder = async (req, res) => {
 
     } catch (err) {
         console.error('Error creating order:', err);
-        res.status(500).json({ message: 'Server Error' });
+        res.status(500).json({ message: 'Hitilafu ya mfumo, tafadhali jaribu tena baadaye' });
     }
 };
 

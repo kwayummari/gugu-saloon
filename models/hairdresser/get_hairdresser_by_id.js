@@ -8,18 +8,18 @@ const getHairDressersById = async (req, res) => {
     connectionPool.query(queries.getHairDresserById, [styleId], async (error, hairDresserResults) => {
       if (error) {
         console.error('Error fetching hair dresser:', error);
-        return res.status(500).json({ message: 'Internal Server Error' });
+        return res.status(500).json({ message: 'Hitilafu ya mfumo, tafadhali jaribu tena baadaye' });
       }
 
       if (hairDresserResults.length === 0) {
-        return res.status(404).json({ message: 'No hair dresser found' });
+        return res.status(404).json({ message: 'Mtaalamu wa nywele hakupatikana' });
       }
 
-      res.status(200).json({ message: 'Hair fetched successfully', hairDresser: hairDresserResults });
+      res.status(200).json({ message: 'Taarifa zimepatikana', hairDresser: hairDresserResults });
     });
   } catch (err) {
     console.error('Error initializing connection:', err);
-    return res.status(500).json({ message: 'Internal Server Error' });
+    return res.status(500).json({ message: 'Hitilafu ya mfumo, tafadhali jaribu tena baadaye' });
   }
 };
 

@@ -8,14 +8,14 @@ const reconciliation = async (req, res) => {
     connectionPool.query(queries.performReconciliation, [companyId, branchId], (error) => {
       if (error) {
         console.error('Error performing reconciliation:', error);
-        return res.status(500).json({ message: 'Internal Server Error' });
+        return res.status(500).json({ message: 'Hitilafu ya mfumo, tafadhali jaribu tena baadaye' });
       }
 
-      res.status(200).json({ message: 'Reconciliation done successfully' });
+      res.status(200).json({ message: 'Uhakiki umefanyika kikamilifu' });
     });
   } catch (err) {
     console.error('Error initializing connection:', err);
-    return res.status(500).json({ message: 'Internal Server Error' });
+    return res.status(500).json({ message: 'Hitilafu ya mfumo, tafadhali jaribu tena baadaye' });
   }
 };
 

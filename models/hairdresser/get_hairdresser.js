@@ -8,21 +8,21 @@ const getHairDressers = async (req, res) => {
     connectionPool.query(queries.getHairDresser, [companyId, branchId], async (error, hairDresserResults) => {
       if (error) {
         console.error('Error fetching hairdresser:', error);
-        return res.status(500).json({ message: 'Internal Server Error' });
+        return res.status(500).json({ message: 'Hitilafu ya mfumo, tafadhali jaribu tena baadaye' });
       }
       if (hairDresserResults.length === 0) {
-        return res.status(200).json({ message: 'No hairdresser found', hairDressers: [] });
+        return res.status(200).json({ message: 'Hakuna wataalamu wa nywele waliopatikana', hairDressers: [] });
       }
 
       const hairDressersWithHairDressing = await Promise.all(hairDresserResults.map(async (hairDresser) => {
         return new Promise((resolve, reject) => {
           connectionPool.query(
-            queries.get_hairdressing2, 
-            [hairDresser.id], 
+            queries.get_hairdressing2,
+            [hairDresser.id],
             (error, hairDressingResults) => {
               if (error) {
                 console.error(`Error fetching hairDressing for hairdresserId ${hairDresser.id}:`, error);
-                reject({ message: 'Internal Server Error' });
+                reject({ message: 'Hitilafu ya mfumo, tafadhali jaribu tena baadaye' });
               } else {
                 resolve({
                   ...hairDresser,
@@ -34,11 +34,11 @@ const getHairDressers = async (req, res) => {
         });
       }));
 
-      res.status(200).json({ message: 'Data fetched successfully', hairDressers: hairDressersWithHairDressing });
+      res.status(200).json({ message: 'Taarifa zimepatikana', hairDressers: hairDressersWithHairDressing });
     });
   } catch (err) {
     console.error('Error initializing connection:', err);
-    return res.status(500).json({ message: 'Internal Server Error' });
+    return res.status(500).json({ message: 'Hitilafu ya mfumo, tafadhali jaribu tena baadaye' });
   }
 };
 

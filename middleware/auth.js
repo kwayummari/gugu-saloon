@@ -12,7 +12,7 @@ const authenticateToken = (req, res, next) => {
 
         if (!token) {
             return res.status(401).json({
-                message: 'Access denied. No token provided.'
+                message: 'Umezuiwa kuingia. Tafadhali ingia kwenye akaunti yako.'
             });
         }
 
@@ -21,7 +21,7 @@ const authenticateToken = (req, res, next) => {
             if (err) {
                 // Token expired or invalid
                 return res.status(403).json({
-                    message: 'Invalid or expired token. Please login again.'
+                    message: 'Muda wa kuingia umeisha au si sahihi. Tafadhali ingia tena.'
                 });
             }
 
@@ -30,7 +30,7 @@ const authenticateToken = (req, res, next) => {
             next();
         });
     } catch (error) {
-        res.status(500).json({ message: 'Server Error' });
+        res.status(500).json({ message: 'Hitilafu ya mfumo, tafadhali jaribu tena baadaye' });
     }
 };
 

@@ -118,23 +118,23 @@ const startShift = async (req, res) => {
         const { branchId, managerId, managerName } = req.body;
 
         if (!branchId || !managerId || !managerName) {
-            return res.status(400).json({ message: 'Branch ID, Manager ID, and Manager Name are required' });
+            return res.status(400).json({ message: 'Tafadhali weka Tawi, Meneja na Jina la Meneja' });
         }
 
         const result = await getOrCreateShift(branchId, managerId, managerName);
 
         if (!result.success) {
-            return res.status(500).json({ message: result.error });
+            return res.status(500).json({ message: 'Hitilafu ya mfumo, tafadhali jaribu tena baadaye' });
         }
 
         res.status(200).json({
-            message: result.isNew ? 'New shift started' : 'Active shift already exists',
+            message: result.isNew ? 'Zamu mpya imeanzishwa' : 'Zamu tayari ipo',
             shift: result.shift,
             isNew: result.isNew
         });
     } catch (error) {
         console.error('Error starting shift:', error);
-        res.status(500).json({ message: 'Server Error' });
+        res.status(500).json({ message: 'Hitilafu ya mfumo, tafadhali jaribu tena baadaye' });
     }
 };
 

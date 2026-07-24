@@ -10,12 +10,12 @@ const { getOrCreateShift } = require('../../services/shiftService');
 const validateLogin = [
   body('email')
     .trim()
-    .notEmpty().withMessage('Email or phone is required'),
+    .notEmpty().withMessage('Tafadhali weka barua pepe au namba ya simu'),
   body('password')
-    .notEmpty().withMessage('Password is required')
-    .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
+    .notEmpty().withMessage('Tafadhali weka nenosiri')
+    .isLength({ min: 8 }).withMessage('Nenosiri lazima liwe na herufi 8 au zaidi')
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/)
-    .withMessage('Password must include at least one uppercase letter, one lowercase letter, one number, and one special character')
+    .withMessage('Nenosiri lazima liwe na herufi kubwa moja, herufi ndogo moja, namba moja, na alama maalum moja (mfano @ $ ! % * ? &)')
 ];
 
 const loginUser = async (req, res) => {
@@ -35,18 +35,18 @@ const loginUser = async (req, res) => {
       async (error, results) => {
         if (error) {
           console.log(error)
-          return res.status(500).json({ message: error.message });
+          return res.status(500).json({ message: 'Hitilafu ya mfumo, tafadhali jaribu tena baadaye' });
         }
 
         if (results.length === 0) {
-          return res.status(400).json({ message: 'Invalid credentials' });
+          return res.status(400).json({ message: 'Barua pepe/namba ya simu au nenosiri si sahihi' });
         }
 
         const user = results[0];
         const passwordMatch = await bcrypt.compare(password.trim(), user.password);
 
         if (!passwordMatch) {
-          return res.status(400).json({ message: 'Invalid credentials' });
+          return res.status(400).json({ message: 'Barua pepe/namba ya simu au nenosiri si sahihi' });
         }
 
         // Remove password from response for security
@@ -127,14 +127,14 @@ const loginUser = async (req, res) => {
           });
 
         res.status(200).json({
-          message: 'Login successful',
+          message: 'Umeingia kikamilifu',
           token,
           user: userWithoutPassword
         });
       }
     );
   } catch (err) {
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: 'Hitilafu ya mfumo, tafadhali jaribu tena baadaye' });
   }
 };
 

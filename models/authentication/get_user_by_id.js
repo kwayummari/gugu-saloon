@@ -9,18 +9,18 @@ const getUserById = async (req, res) => {
     connectionPool.query(queries.getUserById, [id], (error, results) => {
       if (error) {
         console.error('Error fetching user:', error);
-        return res.status(500).json({ message: 'Internal Server Error' });
+        return res.status(500).json({ message: 'Hitilafu ya mfumo, tafadhali jaribu tena baadaye' });
       }
 
       if (results.length === 0) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: 'Mtumiaji hakupatikana' });
       }
 
-      res.status(200).json({ message: 'User fetched successfully', user: results[0] });
+      res.status(200).json({ message: 'Taarifa za mtumiaji zimepatikana', user: results[0] });
     });
   } catch (err) {
     console.error('Error initializing connection:', err);
-    return res.status(500).json({ message: 'Internal Server Error' });
+    return res.status(500).json({ message: 'Hitilafu ya mfumo, tafadhali jaribu tena baadaye' });
   }
 };
 

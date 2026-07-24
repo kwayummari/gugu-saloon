@@ -7,12 +7,12 @@ const { sendSMS } = require('../../services/smsService');
 const { getAdminPhone } = require('../settings/admin_settings');
 
 const validateExpenses = [
-    body('valueHolder').trim().notEmpty().withMessage('Please select expense type'),
-    body('amount').trim().notEmpty().withMessage('Please add amount').isFloat({ gt: 0 }).withMessage('Amount must be a positive number'),
-    body('description').trim().notEmpty().withMessage('Please add description'),
-    body('managerId').isInt().withMessage('Manager ID must be an integer').toInt(),
-    body('branchId').isInt().withMessage('Branch ID must be an integer').toInt(),
-    body('companyId').isInt().withMessage('Company ID must be an integer').toInt()
+    body('valueHolder').trim().notEmpty().withMessage('Tafadhali chagua aina ya matumizi'),
+    body('amount').trim().notEmpty().withMessage('Tafadhali weka kiasi').isFloat({ gt: 0 }).withMessage('Kiasi lazima kiwe namba chanya'),
+    body('description').optional({ checkFalsy: true }).trim(),
+    body('managerId').isInt().withMessage('Hitilafu ya taarifa za meneja').toInt(),
+    body('branchId').isInt().withMessage('Hitilafu ya taarifa za tawi').toInt(),
+    body('companyId').isInt().withMessage('Hitilafu ya taarifa za kampuni').toInt()
 ];
 
 const addExpenses = async (req, res) => {
@@ -21,7 +21,8 @@ const addExpenses = async (req, res) => {
         return res.status(400).json({ message: errors.array()[0].msg });
     }
 
-    const { valueHolder, amount, companyId, branchId, description, managerId } = req.body;
+    const { valueHolder, amount, companyId, branchId, managerId } = req.body;
+    const description = req.body.description || null;
     let connection;
 
     try {
@@ -41,7 +42,7 @@ const addExpenses = async (req, res) => {
         const shiftCheck = await getActiveShift(branchId);
         if (!shiftCheck.success || !shiftCheck.shift) {
             return res.status(403).json({
-                message: 'No active shift. Manager must login to start shift before adding expenses.',
+                message: 'Hakuna zamu iliyoanzishwa. Meneja anatakiwa aanzishe zamu kabla ya kuweka matumizi.',
                 requiresShift: true
             });
         }
@@ -124,7 +125,7 @@ const addExpenses = async (req, res) => {
         // Build expense notification message with proper breakdown
         const balanceUpdate = `\n\nEXPENSES:\nPrevious: ${previousExpenseCount} (${formattedPreviousTotal} Tsh)\nCurrent: ${newExpenseCount} (${formattedNewTotal} Tsh)\n\nORDERS TODAY:\nCount: ${todayOrderCount}\nRevenue: ${formattedOrderRevenue} Tsh\nOffice Amount: ${formattedOfficeAmount} Tsh\nHairdresser Amount: ${formattedHairdresserAmount} Tsh\n\nNET PROFIT: ${formattedNetProfit} Tsh\n(Office Amount - Expenses)`;
 
-        const smsMessage = `NEW EXPENSE ALERT\n\nType: ${expenseTypeName}\nAmount: ${formattedAmount} Tsh\nDescription: ${description}\nBranch: ${branchName}\nCreated by: ${managerName}\nTime: ${expenseTime}${balanceUpdate}\n\n- Gugu Beauty Saloon`;
+        const smsMessage = `NEW EXPENSE ALERT\n\nType: ${expenseTypeName}\nAmount: ${formattedAmount} Tsh\nDescription: ${description || 'N/A'}\nBranch: ${branchName}\nCreated by: ${managerName}\nTime: ${expenseTime}${balanceUpdate}\n\n- Gugu Beauty Saloon`;
 
         // Send SMS to admin (async, don't wait)
         getAdminPhone()
@@ -140,11 +141,11 @@ const addExpenses = async (req, res) => {
                 console.error('❌ Expense SMS notification error:', err.message);
             });
 
-        return res.status(200).json({ message: 'Expense added successfully' });
+        return res.status(200).json({ message: 'Matumizi yamewekwa kikamilifu' });
 
     } catch (err) {
         console.error('Error adding expense:', err);
-        return res.status(500).json({ message: 'Server Error' });
+        return res.status(500).json({ message: 'Hitilafu ya mfumo, tafadhali jaribu tena baadaye' });
     }
 };
 

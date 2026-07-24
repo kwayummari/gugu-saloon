@@ -21,20 +21,20 @@ const payroll = async (req, res) => {
     connectionPool.query(queries.getPayroll, [companyId, branchId, todayDate], (error, results) => {
       if (error) {
         console.error('Error fetching payroll:', error);
-        return res.status(500).json({ message: 'Internal Server Error' });
+        return res.status(500).json({ message: 'Hitilafu ya mfumo, tafadhali jaribu tena baadaye' });
       }
 
       if (results.length === 0) {
         console.log('⚠️ No payroll data found for date:', todayDate);
-        return res.status(200).json({ message: 'No Payroll found' });
+        return res.status(200).json({ message: 'Hakuna taarifa za malipo zilizopatikana' });
       }
 
       console.log('✅ Payroll fetched:', results.length, 'hairdressers');
-      res.status(200).json({ message: 'Payroll fetched successfully', payroll: results });
+      res.status(200).json({ message: 'Taarifa za malipo zimepatikana', payroll: results });
     });
   } catch (err) {
     console.error('Error initializing connection:', err);
-    return res.status(500).json({ message: 'Internal Server Error' });
+    return res.status(500).json({ message: 'Hitilafu ya mfumo, tafadhali jaribu tena baadaye' });
   }
 };
 
