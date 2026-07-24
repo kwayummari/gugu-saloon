@@ -25,46 +25,21 @@ WHERE DATE(o.date) BETWEEN ? AND ?
   AND COALESCE(sh.shift_type, 'full_day') IN (?)
 `,
 
-  getAllCustomers: `WITH RankedOrders AS (
+  getAllCustomers: `
     SELECT
         o.name AS orderName,
-        MAX(o.date) AS date,
-        o.hairStyleId,
+        o.date,
         o.phone,
-        ROW_NUMBER() OVER (
-            PARTITION BY o.name
-            ORDER BY COUNT(o.hairStyleId) DESC
-        ) AS orderRank
+        hs.name AS hairStyleName,
+        hs.amount AS hairStyleAmount
     FROM
         orders o
+    JOIN
+        hairStyle hs ON o.hairStyleId = hs.id
     WHERE
         o.companyId = ? AND o.branchId = ?
-    GROUP BY
-        o.name,
-        o.hairStyleId,
-        o.phone
-),
-MostFrequentHairStyle AS (
-    SELECT
-        ro.orderName,
-        ro.date,
-        ro.hairStyleId,
-        ro.phone
-    FROM
-        RankedOrders ro
-    WHERE
-        ro.orderRank = 1
-)
-SELECT
-    mf.orderName,
-    mf.date,
-    hs.name AS hairStyleName,
-    hs.amount AS hairStyleAmount,
-    mf.phone
-FROM
-    MostFrequentHairStyle mf
-JOIN
-    hairStyle hs ON mf.hairStyleId = hs.id;
+    ORDER BY
+        hs.name ASC, o.date DESC;
 `,
   getUserById: "SELECT * FROM hairdresser WHERE id = ?",
   login: "SELECT * FROM user WHERE email = ? OR phone = ?",
