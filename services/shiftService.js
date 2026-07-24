@@ -4,28 +4,21 @@ const { sendSMS } = require('./smsService');
 const { getAdminPhone } = require('../models/settings/admin_settings');
 
 /**
- * Determine shift type based on current time and branch configuration
+ * Determine shift type from the manager account starting the shift.
+ * Each account is fixed to 'day' or 'night' (user.shift_type), so the
+ * shift it opens is always tagged the same way regardless of clock time.
  */
-const determineShiftType = (branchConfig) => {
-    if (!branchConfig.has_shifts) {
-        return 'full_day';
-    }
+const determineShiftType = async (managerId) => {
+    const connectionPool = await connectionPoolWithRetry();
 
-    const now = new Date();
-    const currentHour = now.getHours();
-    
-    const config = typeof branchConfig.shift_config === 'string' 
-        ? JSON.parse(branchConfig.shift_config) 
-        : branchConfig.shift_config;
-    
-    const dayStart = parseInt(config.day_start?.split(':')[0] || '8');
-    const nightStart = parseInt(config.night_start?.split(':')[0] || '18');
-    
-    if (currentHour >= dayStart && currentHour < nightStart) {
-        return 'day';
-    } else {
-        return 'night';
-    }
+    const user = await new Promise((resolve, reject) => {
+        connectionPool.query(queries.getUserShiftType, [managerId], (error, results) => {
+            if (error) reject(error);
+            else resolve(results[0]);
+        });
+    });
+
+    return user?.shift_type || 'day';
 };
 
 /**
@@ -34,18 +27,12 @@ const determineShiftType = (branchConfig) => {
 const getOrCreateShift = async (branchId, managerId, managerName) => {
     try {
         const connectionPool = await connectionPoolWithRetry();
-        
-        // Get branch shift configuration
-        const branchConfig = await new Promise((resolve, reject) => {
-            connectionPool.query(queries.getBranchShiftConfig, [branchId], (error, results) => {
-                if (error) reject(error);
-                else resolve(results[0]);
-            });
-        });
 
-        // Check if there's an active shift
+        // Check if this manager already has an active shift at this branch.
+        // Scoped per manager so a day account and a night account can each
+        // have their own concurrently-active shift on the same branch.
         const activeShift = await new Promise((resolve, reject) => {
-            connectionPool.query(queries.getActiveShift, [branchId], (error, results) => {
+            connectionPool.query(queries.getActiveShiftForManager, [branchId, managerId], (error, results) => {
                 if (error) reject(error);
                 else resolve(results[0] || null);
             });
@@ -61,7 +48,7 @@ const getOrCreateShift = async (branchId, managerId, managerName) => {
         }
 
         // Create new shift
-        const shiftType = determineShiftType(branchConfig);
+        const shiftType = await determineShiftType(managerId);
         const startTime = new Date();
 
         const newShiftId = await new Promise((resolve, reject) => {
@@ -257,10 +244,38 @@ const getActiveShift = async (branchId) => {
     }
 };
 
+/**
+ * Get active shift for a specific manager at a branch
+ */
+const getActiveShiftForManager = async (branchId, managerId) => {
+    try {
+        const connectionPool = await connectionPoolWithRetry();
+
+        const activeShift = await new Promise((resolve, reject) => {
+            connectionPool.query(queries.getActiveShiftForManager, [branchId, managerId], (error, results) => {
+                if (error) reject(error);
+                else resolve(results[0] || null);
+            });
+        });
+
+        return {
+            success: true,
+            shift: activeShift
+        };
+    } catch (error) {
+        console.error('❌ Error getting active shift for manager:', error);
+        return {
+            success: false,
+            error: error.message
+        };
+    }
+};
+
 module.exports = {
     getOrCreateShift,
     endShift,
     getActiveShift,
+    getActiveShiftForManager,
     determineShiftType
 };
 

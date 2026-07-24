@@ -454,7 +454,7 @@ AND DATE(expenses.date) = CURDATE();
     "INSERT INTO expenses (expense_type_id, amount, description, companyId, branchId, date, shift_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
 
   // Shift Management Queries
-  getBranchShiftConfig: "SELECT has_shifts, shift_config FROM branch WHERE id = ?",
+  getUserShiftType: "SELECT shift_type FROM user WHERE id = ?",
 
   // SMS Alert Settings Queries
   getBranchSmsAlertSettings:
@@ -469,8 +469,12 @@ AND DATE(expenses.date) = CURDATE();
   upsertAdminSettings:
     "INSERT INTO company_settings (id, admin_phone) VALUES (1, ?) ON DUPLICATE KEY UPDATE admin_phone = VALUES(admin_phone)",
 
-  getActiveShift: `SELECT * FROM shifts 
-    WHERE branch_id = ? AND status = 'active' 
+  getActiveShift: `SELECT * FROM shifts
+    WHERE branch_id = ? AND status = 'active'
+    ORDER BY start_time DESC LIMIT 1`,
+
+  getActiveShiftForManager: `SELECT * FROM shifts
+    WHERE branch_id = ? AND manager_id = ? AND status = 'active'
     ORDER BY start_time DESC LIMIT 1`,
 
   createShift: `INSERT INTO shifts 

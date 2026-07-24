@@ -2,7 +2,7 @@ const connectionPoolWithRetry = require('../../database/db_connection');
 const { body, validationResult } = require('express-validator');
 const queries = require('../../database/queries');
 const util = require('util');
-const { getActiveShift } = require('../../services/shiftService');
+const { getActiveShiftForManager } = require('../../services/shiftService');
 const { sendSMS } = require('../../services/smsService');
 const { getAdminPhone } = require('../settings/admin_settings');
 
@@ -39,7 +39,7 @@ const addExpenses = async (req, res) => {
         console.log("Expense Date:", expenseDate);
 
         // Check for active shift - PREVENT EXPENSES WITHOUT ACTIVE SHIFT
-        const shiftCheck = await getActiveShift(branchId);
+        const shiftCheck = await getActiveShiftForManager(branchId, managerId);
         if (!shiftCheck.success || !shiftCheck.shift) {
             return res.status(403).json({
                 message: 'Hakuna zamu iliyoanzishwa. Meneja anatakiwa aanzishe zamu kabla ya kuweka matumizi.',

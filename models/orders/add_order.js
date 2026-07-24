@@ -4,7 +4,7 @@ const { body, validationResult } = require('express-validator');
 const queries = require('../../database/queries');
 const xss = require('xss');
 const { sendSMS, sendOrderConfirmation } = require('../../services/smsService');
-const { getActiveShift } = require('../../services/shiftService');
+const { getActiveShiftForManager } = require('../../services/shiftService');
 const { getAdminPhone } = require('../settings/admin_settings');
 
 const DEFAULT_SMS_ALERT_TEMPLATE = `NEW ORDER ALERT
@@ -60,7 +60,7 @@ const registerOrder = async (req, res) => {
         const sanitizedPhone = xss(phone);
 
         // Check for active shift - PREVENT ORDERS WITHOUT ACTIVE SHIFT
-        const shiftCheck = await getActiveShift(branchId);
+        const shiftCheck = await getActiveShiftForManager(branchId, managerId);
         if (!shiftCheck.success || !shiftCheck.shift) {
             return res.status(403).json({
                 message: 'Hakuna zamu iliyoanzishwa. Meneja anatakiwa aanzishe zamu kabla ya kuweka oda.',
